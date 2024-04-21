@@ -1,0 +1,99 @@
+<div class="d-flex justify-content-center">
+  <div class="p-2 ">Flex item 1</div>
+
+
+  <div class="p-2 ">
+  
+  
+  
+  
+   
+ <div class="row clearfix">
+        <div class="col-md-3" style="margin-top:12px;">
+        @include('frontend.partials.sidebar')
+        </div>
+        <div class="col-md-9" >
+         
+       
+         
+         @include('frontend.partials.property_type')
+       
+       
+         <div class="row" >
+{{--          
+            @include('frontend.agent_horizoontal') --}}
+          @foreach($properties as $property)
+
+            <div class="col-lg-3 col-6" >
+             <a href="/property/{{str_slug($property->property_location->name)}}/{{$property->sub_category->slug}}/{{str_slug($property->title)}}/{{$property->id}}" >
+                     @if($property->featured==1)
+                        <div class="card property_list " style="border: 2px solid ;border-color:#EF8308;">
+                     @else
+                     <div class="card property_list ">
+
+                      @endif
+                    <div class="property_image">
+                       @foreach($property->property_gallery as $key =>$g)
+                             {{--$g--}}
+                             @if($key==0)
+                            <img  class="img-thumbnail" src="{{asset(@$g->path)}}" alt="" title="" style=" flex-shrink: 0; width: 100%;height: 200px; object-fit: cover;" loading="lazy"/>
+                             @endif
+                         
+                       @endforeach
+                       @if($property->featured==1)
+                        <span class="badge badge-success">VIP</span>
+                      @endif
+
+                    </div>
+                    <div class="body">
+                        <div class="property-content">
+                            <div class="detail">
+                              <small class="text-success">  <strong>{{ Str::title($property->currency->name) }}
+                                {{number_format($property->price,0)  }}</strong> </small><br>
+                                <span  style="font-size:12px">{{Str::limit(ucwords(@$property->title),15)}}
+                                </span><br>
+                                
+                                <small class="text-muted"><i class="zmdi zmdi-pin m-r-5"></i><strong>{{Str::limit(@$property->property_location->region->name,10)}},{{Str::limit(@$property->property_location->name,10)}} </strong></small>
+                                 {{-- <p><span style="color:black"> <small>{{
+                                $property->created_at->diffForHumans([
+                                'parts' => 1,
+                               'join' => ', ',
+                                'short' => true]);
+                                }}</small> </span></p> --}}
+                            </div>
+                        
+                        </div>
+                    </div>
+                </div>
+                </a>
+               </div> 
+          @endforeach
+
+ </div>
+       @if ($properties->hasMorePages())
+                    
+                        <div class="row">
+                       
+                            <div class="col-md-12 text-center justify-content-center">
+                                <button wire:click="loadMore()" class="btn btn-primary btn-lg shadow-sm">
+                                    More...</button> 
+                            </div>
+                            &nbsp;
+                        </div>
+                   
+                @else
+                    <div class="row">
+                        <div class="col-md-12 text-center justify-content-center" style="margin-bottom:12px">
+                            <button class="btn btn-danger btn-lg shadow-sm justify-content-right" style="margin:2px;">No
+                                More Posts</button>
+                        </div>
+                    </div>
+         @endif
+ </div>
+
+  
+  
+  </div>
+  </div>
+  <div class="p-2 ">Flex item 3</div>
+</div>
