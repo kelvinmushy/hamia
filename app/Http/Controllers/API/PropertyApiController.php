@@ -9,6 +9,13 @@ use App\Models\Property;
 use App\Models\Region;
 use App\Models\District;
 use App\Models\PropertyTitle;
+use App\Models\Feature;
+use App\Models\Condition;
+use App\Models\Furnish;
+use App\Models\Currency;
+use App\Models\Term;
+use App\Models\NearBye;
+use App\Models\PropertyType;
 use App\Models\PropertyImageGallery;
 use App\Http\Resources\PropertyResource;
 use Validator;
@@ -41,7 +48,7 @@ class PropertyApiController extends BaseController
     }
 
    //get All Propert Will Be Here 
-    public function propertyApi()
+    public function propertyApi($request)
     {
 
     //     $properties = Property::get();
@@ -243,13 +250,9 @@ class PropertyApiController extends BaseController
         return response()->json(['nearby'=>$furnish]);
     }
    
-    public function categoryTypeApi(){
-        $category_type = CategoryType::get();
-        return response()->json(['category_type'=>$category_type]);
-    }
-
-    public function propertyTypeApi(){
-        $property_type = PropertyType::get();
+   
+    public function propertyTypeApi($id){
+        $property_type = PropertyType::where('sub_category_id',$id)->get();
         return response()->json(['property_type'=>$property_type]);
     }
   

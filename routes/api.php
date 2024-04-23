@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\PropertyApiController;
+use App\Http\Controllers\API\AdsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,7 +53,7 @@ Route::post('/add/category', [PropertyApiController::class, 'postCategory']);
 
 Route::get('/delete/category/{id}', [PropertyApiController::class, 'deleteCategory']);
 
-Route::get('/properties/type/{id}', [PropertyApiController::class, 'similarPropertyApi']);
+Route::get('/similar/properties/{id}', [PropertyApiController::class, 'similarPropertyApi']);
 
 Route::get('/properties/sub_category', [PropertyApiController::class, 'subCategoryPropertyApi']);
 
@@ -60,16 +61,13 @@ Route::get('/properties/sub_category', [PropertyApiController::class, 'subCatego
 
 Route::get('/district/{id}', [PropertyApiController::class, 'propertyDistrictApi']);
 
-//category type
-Route::get('/category-type', [PropertyApiController::class, 'categoryTypeApi']);
 
 //feature
 Route::get('/feature', [PropertyApiController::class, 'featureApi']);
 //condition
 Route::get('/condition', [PropertyApiController::class, 'conditionApi']);
 
-//propert_type
-Route::get('/property-type', [PropertyApiController::class, 'propertyTypeApi']);
+
 //condition
 Route::get('/term', [PropertyApiController::class, 'termApi']);
 
@@ -79,6 +77,17 @@ Route::get('/near-by', [PropertyApiController::class, 'nearByApi']);
 
 //Furnish
 Route::get('/furnish', [PropertyApiController::class, 'furnishApi']);
+
+//currency
+Route::get('/currency', [PropertyApiController::class, 'currencyApi']);
+Route::get('/properties/type/{id}', [PropertyApiController::class, 'propertyTypeApi']);
+
+
+//Ads Controller 
+
+
+Route::post('/new/ads', [AdsController::class, 'store']);
+
    
 
 
