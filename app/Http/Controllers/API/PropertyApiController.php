@@ -1,7 +1,7 @@
 <?php
-     
+
 namespace App\Http\Controllers\API;
-     
+
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\SubCategory;
@@ -35,36 +35,36 @@ class PropertyApiController extends BaseController
     {
         $category = Category::all();
 
-        return response()->json(['data'=>$category]);
-        
+        return response()->json(['data' => $category]);
+
     }
 
 
     public function SubcategoryApi()
     {
         $category = SubCategory::all();
-        return response()->json(['subcategory'=>$category]);
-       
+        return response()->json(['subcategory' => $category]);
+
     }
 
-   //get All Propert Will Be Here 
-    public function propertyApi($request)
+    //get All Propert Will Be Here 
+    public function propertyApi(Request $request)
     {
 
-    //     $properties = Property::get();
-    //   $data=[];
-    //     foreach($properties as $properties){
-    //      $images=PropertyImageGallery::where('property_id',$properties->id)->get();
+        //     $properties = Property::get();
+        //   $data=[];
+        //     foreach($properties as $properties){
+        //      $images=PropertyImageGallery::where('property_id',$properties->id)->get();
 
-    //      $data[]=["properties"=>$properties,"images"=>$images];
+        //      $data[]=["properties"=>$properties,"images"=>$images];
 
-    //     }
-    //     return response()->json( [$data] );
+        //     }
+        //     return response()->json( [$data] );
 
-    // $data = Property::paginate(request()->all());    
-    // return response()->json($data, 200);
+        // $data = Property::paginate(request()->all());    
+        // return response()->json($data, 200);
 
-      
+
 
 
 
@@ -81,137 +81,143 @@ class PropertyApiController extends BaseController
         //                     ->with('gallery')
         //                     ->with('bead_room')
         //                     ->latest()->get();
-    
 
-         $pageSize = $request->page_size ?? 5;
-         $properties = Property::with('user')
-         ->with('property_barth')
-         ->with('property_area')
-         ->with('property_currency','property_currency.currency')
-          ->with('property_term','property_term.term')
-         ->with('currency')
-         ->with('property_features','property_features.features')
-         ->with('type')
-          ->with('property_location','property_location.region')
-         ->with('property_near_by','property_near_by.near_by')
-         ->with('gallery')
-         ->with('bead_room')->latest()->paginate($pageSize);
-         return PropertyResource::collection($properties);
-       
-      //  $myCollectionObj = collect($properties);
-  
-      // $data = $this->paginate($myCollectionObj);
 
-      // dd($data);
+        $pageSize = $request->page_size ?? 5;
+        $properties = Property::with('user')
+            ->with('property_barth')
+            ->with('property_area')
+            ->with('property_currency', 'property_currency.currency')
+            ->with('property_term', 'property_term.term')
+            ->with('currency')
+            ->with('property_features', 'property_features.features')
+            ->with('type')
+            ->with('property_location', 'property_location.region')
+            ->with('property_near_by', 'property_near_by.near_by')
+            ->with('gallery')
+            ->with('bead_room')->latest()->paginate($pageSize);
+        return PropertyResource::collection($properties);
 
-       //===return response()->json(['properties'=>$properties]);
-        
+        //  $myCollectionObj = collect($properties);
+
+        // $data = $this->paginate($myCollectionObj);
+
+        // dd($data);
+
+        //===return response()->json(['properties'=>$properties]);
+
     }
 
 
     //Get All Title Will Be Here
     public function propertyTitleApi($id)
     {
-        $propertTitle = PropertyTitle::where('id',$id)->get();
-        return response()->json(['propertyTitle'=>$propertTitle]);
-        
+        $propertTitle = PropertyTitle::where('id', $id)->get();
+        return response()->json(['propertyTitle' => $propertTitle]);
+
     }
- 
+
 
     public function propertyRegionApi()
     {
         $region = Region::get();
-        return response()->json(['region'=>$region]);
-        
+        return response()->json(['region' => $region]);
+
     }
     public function propertyDistrictApi($id)
     {
-        $district =  District::where('region_id',$id)->get();
-        return response()->json(['district'=>$district]);
-        
+        $district = District::where('region_id', $id)->get();
+        return response()->json(['district' => $district]);
+
     }
 
-    
 
-    public  function postCategory(Request $request){
-       
-        $category=new Category();
-        $category->name=$request->fname;
-        $category->slug=$request->lname;
+
+    public function postCategory(Request $request)
+    {
+
+        $category = new Category();
+        $category->name = $request->fname;
+        $category->slug = $request->lname;
         $category->save();
-        return response()->json(['msaage'=>'Data Save']);
+        return response()->json(['msaage' => 'Data Save']);
 
 
     }
- 
-    public function deleteCategory($id){
-         DB::table('categories')->where('id',$id)->delete();
-         return response()->json(['message'=>'Data deleted']);
+
+    public function deleteCategory($id)
+    {
+        DB::table('categories')->where('id', $id)->delete();
+        return response()->json(['message' => 'Data deleted']);
 
 
     }
-    public function editCategory($id){
+    public function editCategory($id)
+    {
 
-        $data=DB::table('categories')->where('id',$id)->first();
-        
-        return response()->json(['data'=>$data]);
+        $data = DB::table('categories')->where('id', $id)->first();
 
-    }
-     public function updateCategory(Request $req){
-                
-       
-        DB::table('categories')->where('id',$req->id)->update(['name'=>$req->name]);
-        return response()->json(['message'=>'Data Updated']);
+        return response()->json(['data' => $data]);
 
     }
+    public function updateCategory(Request $req)
+    {
 
-    public function similarPropertyApi($id){
 
-       
+        DB::table('categories')->where('id', $req->id)->update(['name' => $req->name]);
+        return response()->json(['message' => 'Data Updated']);
+
+    }
+
+    public function similarPropertyApi($id)
+    {
+
+
         $properties = Property::with('user')
-                            ->with('property_barth')
-                            ->with('property_area')
-                            ->with('property_currency','property_currency.currency')
-                             ->with('property_term','property_term.term')
-                            ->with('currency')
-                            ->with('property_features','property_features.features')
-                            ->with('type')
-                             ->with('property_location','property_location.region')
-                            ->with('property_near_by','property_near_by.near_by')
-                            ->with('gallery')
-                            ->with('bead_room')
-                            ->where('properties.type_id',$id)
-                            ->latest()->get();
-                            
+            ->with('property_barth')
+            ->with('property_area')
+            ->with('property_currency', 'property_currency.currency')
+            ->with('property_term', 'property_term.term')
+            ->with('currency')
+            ->with('property_features', 'property_features.features')
+            ->with('type')
+            ->with('property_location', 'property_location.region')
+            ->with('property_near_by', 'property_near_by.near_by')
+            ->with('gallery')
+            ->with('bead_room')
+            ->where('properties.type_id', $id)
+            ->latest()->get();
 
-        return response()->json(['properties'=>$properties]);
+
+        return response()->json(['properties' => $properties]);
 
     }
-    public function subCategoryPropertyApi(Request $request){
+    public function subCategoryPropertyApi(Request $request)
+    {
 
         // dd($request->page);
-         $pageSize = $request->page ?? 10;
+        $pageSize = $request->page ?? 10;
 
         $properties = Property::with('user')
-                            ->with('property_barth')
-                            ->with('property_area')
-                            ->with('property_currency','property_currency.currency')
-                             ->with('property_term','property_term.term')
-                            ->with('currency')
-                            ->with('property_features','property_features.features')
-                            ->with('type')
-                             ->with('property_location','property_location.region')
-                            ->with('property_near_by','property_near_by.near_by')
-                            ->with('gallery')
-                            ->with('bead_room')
-                            //->where('properties.sub_category_id',$id)
-                            ->paginate($pageSize);
-                           // ->latest()->get();
-    
-                           // $myCollectionObj = collect($properties);
-                           // $data = $this->paginate($myCollectionObj);
+            ->with('property_barth')
+            ->with('property_area')
+            ->with('property_currency', 'property_currency.currency')
+            ->with('property_term', 'property_term.term')
+            ->with('currency')
+            ->with('property_features', 'property_features.features')
+            ->with('type')
+            ->with('property_location', 'property_location.region')
+            ->with('property_near_by', 'property_near_by.near_by')
+            ->with('gallery')
+            ->with('bead_room')
+            //->where('properties.sub_category_id',$id)
+            ->paginate($pageSize);
+        // ->latest()->get();
 
-        return response()->json(['properties'=>$properties]);
+        // $myCollectionObj = collect($properties);
+        // $data = $this->paginate($myCollectionObj);
+
+        return response()->json(['properties' => $properties]);
 
     }
 
@@ -223,41 +229,48 @@ class PropertyApiController extends BaseController
     }
 
 
-    public function currencyApi(){
-         
+    public function currencyApi()
+    {
+
         $currency = Currency::get();
-        return response()->json(['currency'=>$currency]);
+        return response()->json(['currency' => $currency]);
 
     }
 
-    public function conditionApi(){
-    
+    public function conditionApi()
+    {
+
         $condition = Condition::get();
-        return response()->json(['condition'=>$condition]);
+        return response()->json(['condition' => $condition]);
 
     }
-    public function featureApi(){
+    public function featureApi()
+    {
         $feature = Feature::get();
-        return response()->json(['feature'=>$feature]);
+        return response()->json(['feature' => $feature]);
 
     }
-    public function nearByApi(){
+    public function nearByApi()
+    {
         $nearby = NearBye::get();
-        return response()->json(['nearby'=>$nearby]);
+        return response()->json(['nearby' => $nearby]);
     }
-    public function furnishApi(){
+    public function furnishApi()
+    {
         $furnish = Furnish::get();
-        return response()->json(['nearby'=>$furnish]);
+        return response()->json(['furnish' => $furnish]);
     }
-   
-   
-    public function propertyTypeApi($id){
-        $property_type = PropertyType::where('sub_category_id',$id)->get();
-        return response()->json(['property_type'=>$property_type]);
+
+
+    public function propertyTypeApi($id)
+    {
+        $property_type = PropertyType::where('sub_category_id', $id)->get();
+        return response()->json(['property_type' => $property_type]);
     }
-  
-    public function TermApi(){
+
+    public function TermApi()
+    {
         $term = Term::get();
-        return response()->json(['payment_term'=>$term]);
+        return response()->json(['payment_term' => $term]);
     }
 }
