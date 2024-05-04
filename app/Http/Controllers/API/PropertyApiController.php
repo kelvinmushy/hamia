@@ -268,6 +268,14 @@ class PropertyApiController extends BaseController
         return response()->json(['property_type' => $property_type]);
     }
 
+    public function allProperty()
+    {
+        $all = DB::table('property_types')->get();
+        dd($all);
+        return response()->json(['all_type' => $all]);
+    }
+
+
     public function TermApi()
     {
         $term = Term::get();

@@ -84,9 +84,18 @@ Route::get('/properties/type/{id}', [PropertyApiController::class, 'propertyType
 
 
 //Ads Controller 
-
-
 Route::post('/new/ads', [AdsController::class, 'store']);
+
+//get list
+Route::get('/all/ads', [AdsController::class, 'getAdsList']);
+//delete Ads Will be here
+Route::delete('/delete/ads/{id}', [AdsController::class, 'delete']);
+
+
+//all property Id will be here
+Route::get('/all/property', [PropertyApiController::class, 'allProperty']);
+
+
 
    
 
