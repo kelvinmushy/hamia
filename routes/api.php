@@ -90,10 +90,11 @@ Route::post('/new/ads', [AdsController::class, 'store']);
 Route::get('/all/ads', [AdsController::class, 'getAdsList']);
 //delete Ads Will be here
 Route::delete('/delete/ads/{id}', [AdsController::class, 'delete']);
-
-
 //all property Id will be here
 Route::get('/all/property', [PropertyApiController::class, 'allProperty']);
+Route::get('/all/district', [PropertyApiController::class, 'allDistrictApi']);
+
+
 
 
 

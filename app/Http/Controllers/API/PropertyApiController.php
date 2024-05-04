@@ -131,6 +131,13 @@ class PropertyApiController extends BaseController
 
     }
 
+  
+    public function allDistrictApi()
+    {
+        $district_all = District::get();
+        return response()->json(['district' => $district_all]);
+
+    }
 
 
     public function postCategory(Request $request)
@@ -271,7 +278,7 @@ class PropertyApiController extends BaseController
     public function allProperty()
     {
         $all = DB::table('property_types')->get();
-        dd($all);
+        
         return response()->json(['all_type' => $all]);
     }
 
