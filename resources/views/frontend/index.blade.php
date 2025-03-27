@@ -19,16 +19,9 @@ is the best place to sell or buy new or used Properties such as  Apartment,Singl
 
 @endsection
 @section('content')
-
-  
-
-
-   
    
      <section style="margin-top:20px" >
        
-
-         
         @livewire('feature-property ',['lazy'=>true])
      @livewireScripts
        
