@@ -35,13 +35,53 @@
     {{--
     <link href="{{ asset('frontend/css/styles.css') }}" rel="stylesheet"> --}}
     <style>
-       
+        #btnSell {
+            background-color: #ffffff;
+            color: #dd4b39;
+            border-radius: 12px;
+        }
 
-       #btnSell{
-        background-color:#ffffff;
-        color: #dd4b39;
-        border-radius:12px;
-       }
+       .property-card {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border-radius: 20px;
+            /* Increased border-radius */
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            height: 100%;
+            /* Ensures uniform height */
+        }
+
+        .property-card:hover {
+            transform: translateY(-5px);
+            /* Increased lift effect */
+            box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.25);
+            /* More prominent hover shadow */
+        }
+
+        .property-image {
+            height: 170px;
+            /* Increased image height */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+        .property-img {
+            width: 100%;
+            height: 170px;
+            /* Match the background-image div */
+            object-fit: cover;
+            border-radius: 20px 20px 0 0;
+            /* Matches card's border-radius */
+        }
+
+        .text-truncate {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     </style>
 </head>
 
