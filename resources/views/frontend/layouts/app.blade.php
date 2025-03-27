@@ -41,7 +41,7 @@
             border-radius: 12px;
         }
 
-       .property-card {
+        .property-card {
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             border-radius: 20px;
             /* Increased border-radius */
@@ -81,6 +81,35 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        agent-card {
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            overflow: hidden;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .agent-image img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ddd;
+        }
+
+        .btn-lg {
+            padding: 10px 20px;
+            font-size: 1rem;
+        }
+
+        .text-muted {
+            font-size: 14px;
         }
     </style>
 </head>
