@@ -2,7 +2,7 @@
     <div class="row m-0"> <!-- Removed margin between rows -->
         <div class="col-md-12">
             <div class="card">
-                <h5 class="card card-header bg-danger text-white"><b>Property Categories</b></h5>
+                <h5 class="card card-header bg-deep-orange text-white"><b>Property Categories</b></h5>
                 <div class="card card-body p-2"> <!-- Reduced padding -->
                     <div class="center">
                         @if($slug=="all")
