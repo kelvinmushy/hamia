@@ -63,9 +63,10 @@
     <div class="row">
     @include('agent.sidebar')
     <div class="col-md-8">
-      <form action="/agent/properties" name="property-form" enctype="multipart/form-data" method="POST"
-      id="property-form">
+      <form enctype="multipart/form-data" name="property-form" id="property-form">
       {{ csrf_field() }}
+
+
       <div class="card">
         <div class="body">
         <div class="row mb-3">
@@ -281,56 +282,101 @@
   <script>
     $(document).ready(function () {
     let selectedFiles = [];
+    let fileNames = new Set(); // Track file names to prevent duplicates
 
+    // Handle new file selection
     $('#property_images').on('change', function (event) {
       const files = event.target.files;
       const previewContainer = $('#image-preview');
-      previewContainer.empty(); // Clear previous previews
-      selectedFiles = Array.from(files);
 
+      // Clear previous previews (but keep track of selected files)
+      previewContainer.find('.image-container').remove();
+
+      // Process new files
+      const newFiles = Array.from(files).filter(file => {
+      // Check for duplicates by name and size
+      const fileKey = `${file.name}-${file.size}`;
+      if (fileNames.has(fileKey)) {
+        return false; // Skip duplicate
+      }
+      fileNames.add(fileKey);
+      return true;
+      });
+
+      // Combine with existing selections
+      selectedFiles = [...selectedFiles, ...newFiles];
+
+      // Enforce 5-image limit
       if (selectedFiles.length > 5) {
-      alert('You can only upload up to 5 images.');
-      $('#property_images').val(""); // Reset file input
-      selectedFiles = [];
-      return;
+      alert('Maximum 5 images allowed. Only the first 5 will be kept.');
+      selectedFiles = selectedFiles.slice(0, 5);
+      fileNames = new Set(selectedFiles.map(f => `${f.name}-${f.size}`));
       }
 
+      // Update file input
+      updateFileInput();
+
+      // Display previews
       selectedFiles.forEach((file, index) => {
       const reader = new FileReader();
-
       reader.onload = function (e) {
-        const img = $('<img>', { src: e.target.result, class: 'preview-image' });
-        const removeButton = $('<button>', { type: 'button', class: 'remove-image' })
-        .text('X')
-        .on('click', function () {
-          selectedFiles.splice(index, 1);
-          updateFileInput();
-          $(this).parent().remove();
+        const img = $('<img>', {
+        src: e.target.result,
+        class: 'preview-image',
+        style: 'width: 100px; height: 100px; object-fit: cover; margin: 5px; border: 1px solid #ddd;'
         });
 
-        const previewDiv = $('<div>', { class: 'image-container' }).append(img).append(removeButton);
+        const removeBtn = $('<button>', {
+        type: 'button',
+        class: 'remove-image btn btn-danger btn-sm',
+        style: 'position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; padding: 0; border-radius: 50%;'
+        }).html('×').click(function () {
+        // Remove from tracking
+        const fileKey = `${file.name}-${file.size}`;
+        fileNames.delete(fileKey);
+        selectedFiles.splice(index, 1);
+        updateFileInput();
+        $(this).parent().remove();
+        });
+
+        const previewDiv = $('<div>', {
+        class: 'image-container',
+        style: 'position: relative; display: inline-block; margin: 5px;'
+        }).append(img).append(removeBtn);
+
         previewContainer.append(previewDiv);
       };
       reader.readAsDataURL(file);
       });
     });
 
+    // Update the file input with current selection
     function updateFileInput() {
       const dataTransfer = new DataTransfer();
-      selectedFiles.forEach((file) => dataTransfer.items.add(file));
+      selectedFiles.forEach(file => dataTransfer.items.add(file));
       $('#property_images')[0].files = dataTransfer.files;
     }
 
+    // Form submission handler
     $("#property-form").submit(function (event) {
       event.preventDefault();
 
       if (selectedFiles.length === 0) {
-      alert("Please upload at least one image.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Please upload at least one image.'
+      });
       return;
       }
 
       let formData = new FormData(this);
-      selectedFiles.forEach(file => formData.append("property_images[]", file));
+
+      // Clear and re-add files to ensure proper formatting
+      formData.delete('property_images[]');
+      selectedFiles.forEach(file => {
+      formData.append('property_images[]', file);
+      });
 
       $.ajax({
       url: "/agent/properties",
@@ -338,16 +384,37 @@
       data: formData,
       contentType: false,
       processData: false,
+      beforeSend: function () {
+        $('.btnSubmit').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
+      },
       success: function (response) {
         if (response.success) {
-        Swal.fire({ icon: 'success', title: 'Success', text: 'Property created successfully!' });
-        window.location.href = '/agent/preview/property/' + response.property_id;
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Property created successfully!',
+          timer: 2000,
+          showConfirmButton: false
+        }).then(() => {
+          window.location.href = '/agent/preview/property/' + response.property_id;
+        });
         } else {
-        Swal.fire({ icon: 'error', title: 'Error', text: response.message });
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: response.message
+        });
         }
       },
       error: function (xhr) {
-        Swal.fire({ icon: 'error', title: 'Error', text: xhr.responseText });
+        Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: xhr.responseJSON?.message || 'An error occurred'
+        });
+      },
+      complete: function () {
+        $('.btnSubmit').prop('disabled', false).html('Submit');
       }
       });
     });

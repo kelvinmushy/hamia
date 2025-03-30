@@ -79,66 +79,66 @@ class PropertyController extends Controller
     }
   }
 
- 
-public function store(Request $request)
-{
+
+  public function store(Request $request)
+  {
     DB::beginTransaction();
 
     try {
-        // Validate the request
-        $this->validateRequest($request);
+      // Validate the request
+      $this->validateRequest($request);
 
-        // Create property and handle associated records
-        $property = $this->createProperty($request);
-        $this->updateOrCreateLocation($property, $request);
-        $this->createPropertyArea($property, $request);
-        $this->createPropertyBathroom($property, $request);
-        $this->createPropertyBedroom($property, $request);
-        $this->createPropertyTerm($property, $request->term_id);
+      // Create property and handle associated records
+      $property = $this->createProperty($request);
+      $this->updateOrCreateLocation($property, $request);
+      $this->createPropertyArea($property, $request);
+      $this->createPropertyBathroom($property, $request);
+      $this->createPropertyBedroom($property, $request);
+      $this->createPropertyTerm($property, $request->term_id);
 
-        // Conditional creation of associated records
-        if ($request->furnish_id) {
-            $this->createPropertyFurnish($property, $request->furnish_id);
-        }
+      // Conditional creation of associated records
+      if ($request->furnish_id) {
+        $this->createPropertyFurnish($property, $request->furnish_id);
+      }
 
-        if ($request->condition_id) {
-            $this->createPropertyCondition($property, $request->condition_id);
-        }
+      if ($request->condition_id) {
+        $this->createPropertyCondition($property, $request->condition_id);
+      }
 
-        if ($request->nearby) {
-            $this->createNearbyProperties($property, $request->nearby);
-        }
+      if ($request->nearby) {
+        $this->createNearbyProperties($property, $request->nearby);
+      }
 
-        if ($request->feature_id) {
-            $this->createFeatureProperties($property, $request->feature_id);
-        }
+      if ($request->feature_id) {
+        $this->createFeatureProperties($property, $request->feature_id);
+      }
 
-        // Save images
-        $this->saveImages($property, $request->file('property_images'));
+      // Save images
+      $this->saveImages($property, $request->file('property_images'));
 
-        // Commit the transaction if everything is successful
-        DB::commit();
+      // Commit the transaction if everything is successful
+      DB::commit();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Ads Published',
-            'property_id' => $property->id,
-        ]);
+      return response()->json([
+        'success' => true,
+        'message' => 'Ads Published',
+        'property_id' => $property->id,
+      ]);
     } catch (Exception $e) {
-        // Rollback the transaction if something goes wrong
-        DB::rollback();
+      // Rollback the transaction if something goes wrong
+      DB::rollback();
 
-        // Optionally, log the error for debugging
-        \Log::error('Error storing property: ' . $e->getMessage());
+      // Optionally, log the error for debugging
+      \Log::error('Error storing property: ' . $e->getMessage());
 
-        // Return an error response
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to publish the ad. Please try again.',
-            'error' => $e->getMessage(),
-        ], 500);
+      // Return an error response
+      return response()->json([
+        'success' => false,
+        'message' => 'Failed to publish the ad. Please try again.',
+        'error' => $e->getMessage(),
+      ], 500);
     }
-}
+  }
   protected function validateRequest(Request $request)
   {
     $request->validate([
@@ -261,33 +261,34 @@ public function store(Request $request)
 
   protected function saveImages(Property $property, $images)
   {
-    if ($images) {
-      foreach ($images as $key => $image) {
-        if ($image) {
-          $imageName = 'images/gallery/' . Str::random() . '.webp';
-          $upload = Image::make($image)->save(public_path($imageName), 50);
-          $size = $upload->filesize();
+    if (empty($images)) {
+      return;
+    }
 
-          if ($key === 0) {
-            // Save only the first image path as the main image for the property
-            $property->image = $imageName;
-          }
-
-          // Save additional images to the PropertyImageGallery model
-          $propertyImageGallery = new PropertyImageGallery();
-          $propertyImageGallery->name = Str::random() . '.webp'; // Change as necessary
-          $propertyImageGallery->path = $imageName;
-          $propertyImageGallery->size = $size;
-          $propertyImageGallery->property_id = $property->id;
-          $propertyImageGallery->save();
-        }
+    foreach ($images as $key => $image) {
+      if (!$image) {
+        continue;
       }
 
-      // Save the property after all images have been processed
-      $property->save();
+      $imageName = 'images/gallery/' . Str::random() . '.webp';
+      $upload = Image::make($image)->save(public_path($imageName), 50);
+      $size = $upload->filesize();
+
+      // Save all images to gallery
+      $propertyImageGallery = new PropertyImageGallery();
+      $propertyImageGallery->name = basename($imageName);
+      $propertyImageGallery->path = $imageName;
+      $propertyImageGallery->size = $size;
+      $propertyImageGallery->property_id = $property->id;
+      $propertyImageGallery->save();
+
+      // Set first image as main property image
+      if ($key === 0) {
+        $property->image = $imageName;
+        $property->save(); // Save immediately for main image
+      }
     }
   }
-
 
   public function edit($id)
   {
@@ -312,113 +313,96 @@ public function store(Request $request)
     return view('agent.properties.edit', compact('condition', 'furnish', 'property', 'sub_category', 'features', 'property_title', 'nearBye', 'property_type', 'property_purpose', 'region', 'category', 'currency', 'district', 'terms'));
   }
 
-
   public function update(Request $request)
   {
-
+    //dd($request);
     $request->validate([
-      'title' => 'required',
-      'price' => 'required',
-      'currency_id' => 'required',
-
-      'type_id' => 'required',
-
-
-      'region_id' => 'required',
-      'sub_location' => 'required',
-      'area' => 'required',
-      'description' => 'required',
-
+      'property_id' => 'required|exists:properties,id',
+      'property_images' => 'sometimes|array',
+      'property_images.*' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
+      'existing_images' => 'sometimes|array',
     ]);
 
-    $image = $request->file('property_images');
-    $property = Property::find($request->property_id);
-    $property->title = $request->title;
-    $property->price = $request->price;
-    $property->type_id = $request->type_id;
-    $property->image = $image;
-    $property->category_id = 1;
-    $property->sub_category_id = $request->sub_category_id;
-    $property->currency_id = $request->currency_id;
-    $property->agent_id = Auth::user()->id;
-    //dd(Auth::user()->id);
+    DB::beginTransaction();
 
-    $property->agent_id = Auth::id();
-    $property->description = $request->description;
+    try {
+      $property = Property::with('property_gallery')->findOrFail($request->property_id);
 
-    $property->save();
+      // 1. Delete images that aren't in the existing_images array
+      $currentImagePaths = $property->property_gallery->pluck('path')->toArray();
+      $imagesToKeep = $request->existing_images ?? [];
 
+      $imagesToDelete = array_diff($currentImagePaths, $imagesToKeep);
+      $this->deleteSelectedImages($property, $imagesToDelete);
 
+      // 2. Add new images
+      if ($request->hasFile('property_images')) {
 
-    if (isset($request->bathroom)) {
-      PropertyBarth::updateOrCreate(['property_id' => $request->property_id], ['property_id' => $request->property_id, 'value' => $request->bathroom]);
-    }
+          // dd($request);
 
-    if (isset($request->bedroom)) {
-      PropertyBeadRoom::updateOrCreate(['property_id' => $request->property_id], ['property_id' => $request->property_id, 'value' => $request->bedroom]);
-    }
+        $this->saveImages($property, $request->file('property_images'));
 
-    if (isset($request->area)) {
-      PropertyArea::updateOrCreate(['property_id' => $request->property_id], ['property_id' => $request->property_id, 'value' => $request->area]);
-    }
-    if (isset($request->term_id)) {
-      PropertyTerm::updateOrCreate(['property_id' => $request->property_id], ['property_id' => $request->property_id, 'term_id' => $request->term_id]);
-    }
-    if (isset($request->region_id)) {
-      PropertyLocation::updateOrCreate(
-        ['property_id' => $property->id],
-        ['property_id' => $property->id, 'region_id' => $request->region_id, 'name' => $request->sub_location, 'district_id' => $request->district_id]
-      );
-
-    }
-
-    if (isset($request->condition_id)) {
-      PropertyCondition::updateOrCreate(
-        ['property_id' => $property->id],
-        ['property_id' => $property->id, 'condition_id' => $request->condition_id]
-      );
-
-    }
-    if (isset($request->furnish_id)) {
-      PropertyFurnish::updateOrCreate(
-        ['property_id' => $property->id],
-        ['property_id' => $property->id, 'furnish_id' => $request->furnish_id]
-      );
-
-    }
-    if ($request->nearby) {
-      PropertyNearBy::where('property_id', $request->property_id)->delete();
-      $items2 = $request->nearby;
-      foreach ($items2 as $item) {
-        $nearBy = new PropertyNearBy();
-        $nearBy->near_by_id = $item;
-        $nearBy->property_id = $property->id;
-        $nearBy->save();
       }
 
+      DB::commit();
+
+      return response()->json([
+        'success' => true,
+        'message' => 'Property images updated successfully',
+        'property_id' => $property->id,
+      ]);
+
+    } catch (\Exception $e) {
+      DB::rollback();
+      \Log::error('Property update failed: ' . $e->getMessage());
+
+      return response()->json([
+        'success' => false,
+        'message' => 'Failed to update property images',
+        'error' => $e->getMessage(),
+      ], 500);
     }
-    if ($request->feature_id) {
-      FeatureProperty::where('property_id', $request->property_id)->delete();
-      $items2 = $request->feature_id;
-      foreach ($items2 as $item) {
-        $features = new FeatureProperty();
-        $features->feature_id = $item;
-        $features->property_id = $property->id;
-        $features->save();
-      }
-
-    }
-
-
-    return response()->json([
-      'success' => true,
-      'message' => 'Ads Published',
-      'property_id' => $property->id
-    ]);
-
   }
 
+  protected function deleteSelectedImages(Property $property, array $imagePaths)
+  {
+    foreach ($imagePaths as $path) {
+      $image = $property->property_gallery()->where('path', $path)->first();
+      if ($image) {
+        try {
+          $fullPath = public_path($path);
+          if (file_exists($fullPath)) {
+            unlink($fullPath);
+          }
+          $image->delete();
+        } catch (\Exception $e) {
+          \Log::error("Failed to delete image: {$path} - " . $e->getMessage());
+          throw $e;
+        }
+      }
+    }
+  }
 
+  protected function saveNewPropertyImages(Property $property, $images)
+  {
+    $galleryPath = public_path('/images/gallery/');
+
+    if (!file_exists($galleryPath)) {
+      mkdir($galleryPath, 0755, true);
+    }
+
+    foreach ($images as $image) {
+      $filename = 'property_' . $property->id . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+      $image->move($galleryPath, $filename);
+
+      $property->property_gallery()->create([
+        'path' => '/images/gallery/' . $filename,
+        'name' => $filename,
+        'original_name' => $image->getClientOriginalName(),
+        'size' => $image->getSize(),
+      ]);
+    }
+  }
   public function destroy(Property $property)
   {
     $property = Property::find($property->id);
@@ -548,5 +532,45 @@ public function store(Request $request)
       'message' => 'Data Deleted'
     ]);
 
+  }
+
+  // This function deletes old images before saving the new ones
+  protected function deleteOldImages(Property $property)
+  {
+    // Delete the old main image if it exists
+    if ($property->image && file_exists(public_path($property->image))) {
+      unlink(public_path($property->image));  // Delete the main image
+    }
+
+    // Delete all old images in the gallery
+    $propertyImages = PropertyImageGallery::where('property_id', $property->id)->get();
+    foreach ($propertyImages as $image) {
+      if (file_exists(public_path($image->path))) {
+        unlink(public_path($image->path));  // Delete each image in the gallery
+      }
+      $image->delete();  // Remove the image from the database
+    }
+  }
+
+  protected function shouldDeleteImage($imagePath)
+  {
+    // Implement your logic to determine if image should be deleted
+    return true; // or false based on your requirements
+  }
+
+  protected function deleteImage($imagePath)
+  {
+    try {
+      // Delete from storage
+      if (Storage::disk('public')->exists($imagePath)) {
+        Storage::disk('public')->delete($imagePath);
+      }
+
+      // Delete from database
+      PropertyImageGallery::where('path', $imagePath)->delete();
+    } catch (\Exception $e) {
+      \Log::error('Image deletion failed', ['path' => $imagePath, 'error' => $e]);
+      throw $e;
+    }
   }
 }

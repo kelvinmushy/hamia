@@ -185,7 +185,7 @@ Route::group(['prefix'=>'agent','middleware'=>['auth','verified'],'as'=>'agent.'
     Route::post('/multiple/update/image/properties','App\Http\Controllers\Agent\PropertyController@imageUpdateStore');
 
    
-    Route::get('/preview/propery/{id}','App\Http\Controllers\Agent\PropertyController@previewProperty')->name('preview.property');
+    Route::get('/preview/property/{id}','App\Http\Controllers\Agent\PropertyController@previewProperty')->name('preview.property');
     Route::get('/property/change_status/{id}','App\Http\Controllers\Agent\PropertyController@propertyStatus');
     
     Route::post('properties/gallery/delete','PropertyController@galleryImageDelete')->name('gallery-delete');
