@@ -327,7 +327,41 @@ class PropertyController extends Controller
 
     try {
       $property = Property::with('property_gallery')->findOrFail($request->property_id);
+     
+       //Update the property details
+      $property->update([
+        'title' => $request->title,
+        'price' => $request->price,
+        'currency_id' => $request->currency_id,
+        'type_id' => $request->type_id,
+        'category_id' => 1,
+        'sub_category_id' => $request->sub_category_id,
+        'description' => $request->description,
+      ]);
+     // update the associated records
 
+      $this->updateOrCreateLocation($property, $request);
+      $this->updateOrCreateArea($property, $request);
+      $this->updateOrCreateBedroom($property, $request);
+      $this->updateOrCreateBathroom($property, $request);
+      $this->updateOrCreateTerm($property, $request->term_id);
+
+      // Update conditional associated records
+      if ($request->furnish_id) {
+        $this->updateOrCreateFurnish($property, $request->furnish_id);
+      }
+
+      if ($request->condition_id) {
+        $this->updateOrCreateCondition($property, $request->condition_id);
+      }
+
+      if ($request->nearby) {
+        $this->updateOrCreateNearbyProperties($property, $request->nearby);
+      }
+
+      if ($request->feature_id) {
+        $this->updateOrCreateFeatureProperties($property, $request->feature_id);
+      }
       // 1. Delete images that aren't in the existing_images array
       $currentImagePaths = $property->property_gallery->pluck('path')->toArray();
       $imagesToKeep = $request->existing_images ?? [];
@@ -338,7 +372,7 @@ class PropertyController extends Controller
       // 2. Add new images
       if ($request->hasFile('property_images')) {
 
-          // dd($request);
+        // dd($request);
 
         $this->saveImages($property, $request->file('property_images'));
 
@@ -363,7 +397,87 @@ class PropertyController extends Controller
       ], 500);
     }
   }
+  // protected function updateOrCreateLocation(Property $property, Request $request)
+  // {
+  //   PropertyLocation::updateOrCreate(
+  //     ['property_id' => $property->id],
+  //     [
+  //       'region_id' => $request->region_id,
+  //       'name' => $request->sub_location,
+  //       'district_id' => $request->district_id,
+  //     ]
+  //   );
+  // }
 
+  protected function updateOrCreateArea(Property $property, Request $request)
+  {
+    PropertyArea::updateOrCreate(
+      ['property_id' => $property->id],
+      ['value' => $request->area]
+    );
+  }
+
+  protected function updateOrCreateBedroom(Property $property, Request $request)
+  {
+    PropertyBeadRoom::updateOrCreate(
+      ['property_id' => $property->id],
+      ['value' => $request->bedroom]
+    );
+  }
+
+  protected function updateOrCreateBathroom(Property $property, Request $request)
+  {
+    PropertyBarth::updateOrCreate(
+      ['property_id' => $property->id],
+      ['value' => $request->bathroom]
+    );
+  }
+
+  protected function updateOrCreateTerm(Property $property, $termId)
+  {
+    PropertyTerm::updateOrCreate(
+      ['property_id' => $property->id],
+      ['term_id' => $termId]
+    );
+  }
+
+  protected function updateOrCreateFurnish(Property $property, $furnishId)
+  {
+    PropertyFurnish::updateOrCreate(
+      ['property_id' => $property->id],
+      ['furnish_id' => $furnishId]
+    );
+  }
+
+  protected function updateOrCreateCondition(Property $property, $conditionId)
+  {
+    PropertyCondition::updateOrCreate(
+      ['property_id' => $property->id],
+      ['condition_id' => $conditionId]
+    );
+  }
+
+  protected function updateOrCreateNearbyProperties(Property $property, array $nearbyIds)
+  {
+    // Delete existing nearby properties and add new ones
+    PropertyNearBy::where('property_id', $property->id)->delete();
+    foreach ($nearbyIds as $item) {
+      PropertyNearBy::updateOrCreate(
+        ['property_id' => $property->id, 'near_by_id' => $item]
+      );
+    }
+  }
+
+  protected function updateOrCreateFeatureProperties(Property $property, array $featureIds)
+  {
+    // Delete existing features and add new ones
+    FeatureProperty::where('property_id', $property->id)->delete();
+    foreach ($featureIds as $item) {
+      FeatureProperty::updateOrCreate(
+        ['property_id' => $property->id, 'feature_id' => $item]
+      );
+    }
+  }
   protected function deleteSelectedImages(Property $property, array $imagePaths)
   {
     foreach ($imagePaths as $path) {

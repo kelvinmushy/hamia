@@ -404,22 +404,7 @@
           </div>
         </div>
         <div class="row">
-          {{--
-          <div class="col-md-4">
-          <div class="form-group">
-            <label>Category</label>
-            <select class="form-control select_category" name="category_id" id="category_id" required
-            style="width:100%">
-            <option value="">Select</option>
-            @foreach($category as $c)
-            <option value="{{$c->id}}" {{ $c->id == $property->category_id ? 'selected' : '' }}>{{ $c->name }}
-            </option>
-            @endforeach
-            </select>
-            @error('category_id') <span class="text-danger">{{ $message }}</span> @enderror
-          </div>
-          </div>
-          --}}
+         
           <div class="col-md-6">
           <div class="form-group">
             <label>Property Category</label>
