@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class PropertyTerm extends Model
 {
     //
-    protected $fillable=['term_id','property_id'];
+    protected $fillable=['term_id','property_id','creator_id','updator_id'];
 
 
      public function term()

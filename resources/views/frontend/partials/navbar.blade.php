@@ -61,7 +61,7 @@
           </li>
 
           <li class="nav-item">
-            <a href="/agent/properties/create" class="nav-link" style="color:orange; font-size: large;">SELL</a>
+            <a href="/agent/properties/create"  id="btnSell"  class="nav-link" style="color:orange; font-size: large;margin-right:2px">SELL</a>
           </li>
         @endguest
       </ul>
