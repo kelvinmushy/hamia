@@ -252,13 +252,7 @@ class PropertyController extends Controller
     }
   }
 
-  public function show(Property $property)
-  {
-    $property = Property::withCount('comments')->find($property->id);
-    $videoembed = $convertYoutube($property->video, 560, 315);
-    return view('agent.properties.show', compact('property', 'videoembed'));
-  }
-
+ 
   protected function saveImages(Property $property, $images)
   {
     if (empty($images)) {

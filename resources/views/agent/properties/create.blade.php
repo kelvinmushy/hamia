@@ -218,7 +218,7 @@
         </div>
 
         <div class="row mb-3">
-          <div class="col-md-6">
+          <div class="col-md-6 propertCondition">
           <div class="form-group">
             <label for="condition_id">Condition</label>
             <select class="form-control select_condition" name="condition_id" id="condition_id">
@@ -228,7 +228,7 @@
             </select>
           </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-6 propertFurnish">
           <div class="form-group">
             <label for="furnish_id">Furnishing</label>
             <select class="form-control select_furnish" name="furnish_id" id="furnish_id">
@@ -248,14 +248,14 @@
             @error('area') <span class="text-danger">{{ $message }}</span> @enderror
           </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-4 propertyBeadRoam">
           <div class="form-group">
             <label for="bedroom">Bedroom</label>
             <input type="number" class="form-control" name="bedroom" />
             @error('bedroom') <span class="text-danger">{{ $message }}</span> @enderror
           </div>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-4 propertyBathRoam">
           <div class="form-group">
             <label for="bathroom">Bathroom</label>
             <input type="number" class="form-control" name="bathroom" />
@@ -389,15 +389,7 @@
       },
       success: function (response) {
         if (response.success) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Success',
-          text: 'Property created successfully!',
-          timer: 2000,
-          showConfirmButton: false
-        }).then(() => {
           window.location.href = '/agent/preview/property/' + response.property_id;
-        });
         } else {
         Swal.fire({
           icon: 'error',
@@ -473,7 +465,10 @@
     })
 
     $('#sub_category_id').on('change', function () {
+
       var id = $('#sub_category_id').val();
+     
+
       if (id == 1 || id == 6 || id == 13) {
       $('.propertyBeadRoam').show();
       $('.propertyBathRoam').show();

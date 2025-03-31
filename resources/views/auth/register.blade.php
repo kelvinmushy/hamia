@@ -1,80 +1,91 @@
+
 @extends('frontend.layouts.app')
 
 @section('content')
 
-    <div class="row">
-        <div class="col s12 m6 offset-m3">
-            <div class="card">
-                <h4 class="center indigo-text uppercase p-t-30">{{ __('Register') }}</h4>
+<div class="row justify-content-center mt-1">
+    <div class="col-md-6">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0">{{ __('Register') }}</h4>
+            </div>
 
-                <div class="p-20">
-                    <form method="POST" action="{{ route('register') }}">
-                        @csrf
+            <div class="card-body p-4">
+                <form method="POST" action="{{ route('register') }}">
+                    @csrf
 
-                        <div class="row">
-                            <div class="input-field col s12">
-                                <label for="name">{{ __('Name') }}</label>
-                                <input id="name" type="text" class="{{ $errors->has('name') ? 'is-invalid' : '' }}" name="name" value="{{ old('name') }}" required autofocus>
+                    <!-- Name Field -->
+                    <div class="form-floating mb-3">
+                        <input id="name" type="text" name="name" 
+                               class="form-control {{ $errors->has('name') ? 'is-invalid' : '' }}" 
+                               value="{{ old('name') }}" required autofocus>
+                        <label for="name">{{ __('Name') }}</label>
 
-                                @if ($errors->has('name'))
-                                    <span class="helper-text" data-error="wrong" data-success="right">
-                                        <strong>{{ $errors->first('name') }}</strong>
-                                    </span>
-                                @endif
+                        @if ($errors->has('name'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('name') }}
                             </div>
-                        </div>
+                        @endif
+                    </div>
 
-                        <div class="row">
-                            <div class="input-field col s12">
-                                <label for="email">{{ __('E-Mail Address') }}</label>
-                                <input id="email" type="email" class="{{ $errors->has('email') ? 'is-invalid' : '' }}" name="email" value="{{ old('email') }}" required>
+                    <!-- Email Field -->
+                    <div class="form-floating mb-3">
+                        <input id="email" type="email" name="email" 
+                               class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" 
+                               value="{{ old('email') }}" required>
+                        <label for="email">{{ __('E-Mail Address') }}</label>
 
-                                @if ($errors->has('email'))
-                                    <span class="helper-text" data-error="wrong" data-success="right">
-                                        <strong>{{ $errors->first('email') }}</strong>
-                                    </span>
-                                @endif
+                        @if ($errors->has('email'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('email') }}
                             </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="input-field col s12">
-                                <label for="password">{{ __('Password') }}</label>
-                                <input id="password" type="password" class="{{ $errors->has('password') ? 'is-invalid' : '' }}" name="password" required>
-                                
-                                @if ($errors->has('password'))
-                                <span class="helper-text" data-error="wrong" data-success="right">
-                                    <strong>{{ $errors->first('password') }}</strong>
-                                    </span>
-                                    @endif
+                        @endif
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="form-floating mb-3">
+                        <input id="password" type="password" name="password" 
+                               class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" required>
+                        <label for="password">{{ __('Password') }}</label>
+
+                        @if ($errors->has('password'))
+                            <div class="invalid-feedback">
+                                {{ $errors->first('password') }}
                             </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="input-field col s12">
-                                <label for="password-confirm">{{ __('Confirm Password') }}</label>
-                                <input id="password-confirm" type="password" name="password_confirmation" required>
-                            </div>
-                        </div>
-                        
-                        <p>
-                            <label>
-                                <input type="checkbox" name="agent" class="filled-in" />
-                                <span>{{ __('Registration as Agent') }}</span>
-                            </label>
-                        </p>
-                        
-                        <div class="row">
-                            <div class="input-field col s12">
-                                <button type="submit" class="waves-effect waves-light btn indigo">
-                                    {{ __('Register') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                        @endif
+                    </div>
+
+                    <!-- Confirm Password Field -->
+                    <div class="form-floating mb-3">
+                        <input id="password-confirm" type="password" name="password_confirmation" 
+                               class="form-control" required>
+                        <label for="password-confirm">{{ __('Confirm Password') }}</label>
+                    </div>
+
+                    <!-- Checkbox for Agent Registration -->
+                    <div class="form-check mb-3">
+                        <input type="checkbox" name="agent" class="form-check-input" id="agent">
+                        <label class="form-check-label" for="agent">
+                            {{ __('Register as an Agent') }}
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-user-plus me-2"></i> {{ __('Register') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-footer text-center">
+                <p class="mb-0">Already have an account? 
+                    <a href="{{ route('login') }}" class="text-primary fw-bold">Login</a>
+                </p>
             </div>
         </div>
     </div>
 </div>
+
 @endsection
