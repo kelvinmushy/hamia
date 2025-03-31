@@ -162,8 +162,22 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/feature/checkbox/edit/{id}', [App\Http\Controllers\Admin\FeatureController::class, 'editFeatureCheckBox']);
 });
 
-
 Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified'], 'as' => 'agent.'], function () {
+    Route::get('/company', [CompanyController::class, 'index'])->name('company.index');
+    Route::get('/region/district', [App\Http\Controllers\AjaxFormContentController::class, 'getDistrict']);
+    Route::post('/company', [CompanyController::class, 'store'])->name('company.store'); // Store new company
+    Route::get('/company/{company}/edit', [CompanyController::class, 'edit'])->name('company.edit'); // Edit company form
+    
+    Route::post('/company/{company}/update', [CompanyController::class, 'update'])->name('company.update'); // Update company
+    
+    Route::get('/company/{company}', [CompanyController::class, 'show'])->name('company.show'); // Optional: Show company details
+    
+    Route::get('/properties/{id}/edit', 'App\Http\Controllers\Agent\PropertyController@update');
+
+
+});
+
+Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified','hasCompany'], 'as' => 'agent.'], function () {
 
     Route::get('dashboard', [App\Http\Controllers\Agent\DashboardController::class, 'index'])->name('dashboard');
     Route::get('profile', [App\Http\Controllers\Agent\DashboardController::class, 'profile'])->name('profile');
@@ -178,20 +192,12 @@ Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified'], 'as' =>
 
     Route::resource('properties', 'App\Http\Controllers\Agent\PropertyController');
     #Compony Controller
-    Route::resource('/company', CompanyController::class)->names([
-        'index' => 'company.index',
-    ]);
+    // Route::resource('/company', CompanyController::class)->names([
+    //     'index' => 'company.index',
+    // ]);
 
-    Route::post('/company', [CompanyController::class, 'store'])->name('company.store'); // Store new company
-
-    Route::get('/company/{company}/edit', [CompanyController::class, 'edit'])->name('company.edit'); // Edit company form
-    
-    Route::post('/company/{company}/update', [CompanyController::class, 'update'])->name('company.update'); // Update company
-    
-    Route::get('/company/{company}', [CompanyController::class, 'show'])->name('company.show'); // Optional: Show company details
-    
-    Route::get('/properties/{id}/edit', 'App\Http\Controllers\Agent\PropertyController@update');
-
+  
+ 
     //store multiple Images
     Route::post('/update/properties', 'App\Http\Controllers\Agent\PropertyController@update');
 
@@ -206,8 +212,7 @@ Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified'], 'as' =>
     Route::post('properties/gallery/delete', 'PropertyController@galleryImageDelete')->name('gallery-delete');
 
     Route::get('/subcategory/propertyType', [App\Http\Controllers\AjaxFormContentController::class, 'propertyType']);
-    Route::get('/region/district', [App\Http\Controllers\AjaxFormContentController::class, 'getDistrict']);
-
+   
 
     Route::post('properties/gallery/delete', 'PropertyController@galleryImageDelete')->name('gallery-delete');
 

@@ -4,10 +4,8 @@
             <!-- User Info (Image and Name on Left) -->
             <div class="row align-items-center mb-4">
                 <div class="col-auto">
-                    <img 
-                        src="{{ url(isset(auth()->user()->image) ? auth()->user()->image : 'images/noimage.jpg') }}" 
-                        alt="{{ auth()->user()->name }}" 
-                        class="img-fluid rounded-circle" 
+                    <img src="{{ url(isset(auth()->user()->image) ? auth()->user()->image : 'images/noimage.jpg') }}"
+                        alt="{{ auth()->user()->name }}" class="img-fluid rounded-circle"
                         style="height: 100px; width: 100px; object-fit: cover; border: 3px solid #ddd;">
                 </div>
                 <div class="col">
@@ -28,7 +26,8 @@
 
                 <!-- Sidebar Item 2: Project/Mradi with Submenu -->
                 <div class="sidebar-item mb-2">
-                    <a class="nav-link d-flex align-items-center" href="#" data-bs-toggle="collapse" data-bs-target="#submenu1" aria-expanded="false" aria-controls="submenu1">
+                    <a class="nav-link d-flex align-items-center" href="#" data-bs-toggle="collapse"
+                        data-bs-target="#submenu1" aria-expanded="false" aria-controls="submenu1">
                         <i class="fa fa-cogs me-2"></i>
                         <span>Project/Mradi</span>
                     </a>
@@ -41,7 +40,8 @@
 
                 <!-- Sidebar Item 3: Customer/Client with Submenu -->
                 <div class="sidebar-item mb-2">
-                    <a class="nav-link d-flex align-items-center" href="#" data-bs-toggle="collapse" data-bs-target="#submenu2" aria-expanded="false" aria-controls="submenu2">
+                    <a class="nav-link d-flex align-items-center" href="#" data-bs-toggle="collapse"
+                        data-bs-target="#submenu2" aria-expanded="false" aria-controls="submenu2">
                         <i class="fa fa-users me-2"></i>
                         <span>Customer/Client</span>
                     </a>
@@ -54,7 +54,8 @@
 
                 {{-- <!-- Sidebar Item 4: Tenate with Submenu -->
                 <div class="sidebar-item mb-2">
-                    <a class="nav-link d-flex align-items-center" href="#" data-bs-toggle="collapse" data-bs-target="#submenu3" aria-expanded="false" aria-controls="submenu3">
+                    <a class="nav-link d-flex align-items-center" href="#" data-bs-toggle="collapse"
+                        data-bs-target="#submenu3" aria-expanded="false" aria-controls="submenu3">
                         <i class="fa fa-building me-2"></i>
                         <span>Tenate</span>
                     </a>
@@ -83,11 +84,13 @@
 
                 <!-- Sidebar Item 7: Profile -->
                 <div class="sidebar-item mb-2">
-                    <a href="{{ route('agent.profile') }}" class="d-flex align-items-center text-dark">
+                    <a href="{{ route('agent.company.edit', auth()->user()->company->id ?? '') }}"
+                        class="d-flex align-items-center text-dark">
                         <i class="fa fa-user me-2"></i>
                         <span>Profile</span>
                     </a>
                 </div>
+
 
                 <!-- Sidebar Item 8: Change Password -->
                 <div class="sidebar-item mb-2">

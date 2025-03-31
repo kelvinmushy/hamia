@@ -72,6 +72,11 @@ class User extends Authenticatable  implements MustVerifyEmail
         $total=DB::table('properties')->where('purpose_id',2)->where('agent_id',$id)->count();
         return $total;
     }
+
+    public function company()
+    {
+        return $this->hasOne(Company::class);
+    }
     
 
 }

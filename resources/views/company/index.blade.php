@@ -203,43 +203,54 @@
                 this.value = value;
             });
 
-            // AJAX Form Submission
-            $('#companyRegistrationForm').on('submit', function (event) {
-                event.preventDefault(); // Prevent default form submission
+            $(document).ready(function () {
+                $('#companyRegistrationForm').on('submit', function (event) {
+                    event.preventDefault(); // Prevent default form submission
 
-                let formData = new FormData(this);
+                    let formData = new FormData(this);
 
-                $.ajax({
-                    url: "{{ route('agent.company.store') }}",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    beforeSend: function () {
-                        $('.btn-primary').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Saving...');
-                    },
-                    success: function (response) {
-                        $('.btn-primary').prop('disabled', false).html('<i class="fa fa-save"></i> Update Company');
+                    $.ajax({
+                        url: "{{ route('agent.company.store') }}",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        beforeSend: function () {
+                            $('.btn-primary').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Saving...');
+                        },
+                        success: function (response) {
+                            $('.btn-primary').prop('disabled', false).html('<i class="fa fa-save"></i> Register Company');
 
-                        if (response.success) {
-                            alert(response.message); // Show success message
-                            window.location.href = response.redirect_url; // Redirect to company list
-                        } else {
-                            alert('Error: ' + response.message);
+                            // Handle success
+                            toastr.success(response.message);
+                            setTimeout(() => {
+                                window.location.href = response.redirect_url; // Redirect to success URL
+                            }, 2000);
+                        },
+                        error: function (xhr) {
+                            $('.btn-primary').prop('disabled', false).html('<i class="fa fa-save"></i> Register Company');
+
+                            if (xhr.status === 400 && xhr.responseJSON.redirect_url) {
+                                // Show error message and redirect if user already has a company
+                                toastr.error(xhr.responseJSON.message);
+                                setTimeout(() => {
+                                    window.location.href = xhr.responseJSON.redirect_url;
+                                }, 2000);
+                            } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                // Show validation errors
+                                let errorMessages = '';
+                                $.each(xhr.responseJSON.errors, function (key, value) {
+                                    errorMessages += value[0] + '<br>';
+                                });
+                                toastr.error(errorMessages);
+                            } else {
+                                toastr.error('Something went wrong. Please try again.');
+                            }
                         }
-                    },
-                    error: function (xhr) {
-                        $('.btn-primary').prop('disabled', false).html('<i class="fa fa-save"></i> Register Company');
-
-                        let errors = xhr.responseJSON.errors;
-                        let errorMessages = '';
-                        $.each(errors, function (key, value) {
-                            errorMessages += value[0] + '\n';
-                        });
-                        alert('Error:\n' + errorMessages);
-                    }
+                    });
                 });
             });
+
         });
 
     </script>

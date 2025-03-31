@@ -38,62 +38,73 @@ class CompanyController extends Controller
      * Store a newly created resource in storage.
      */
 
-     public function store(Request $request)
-     {
-         $request->validate([
-             'name' => 'required|string|max:255',
-             'email' => 'required|email|unique:companies,email',
-             'phone_number' => 'required',
-             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-             'district_id' => 'required|exists:districts,id',
-             'sub_location' => 'nullable|string|max:255',
-         ]);
-     
-         DB::beginTransaction(); // Start Transaction
-     
-         try {
-             // Handle logo upload
-             $logoPath = null;
-             if ($request->hasFile('logo')) {
-                 $logoPath = $request->file('logo')->store('logos', 'public');
-             }
-     
-             // Create the company
-             $company = Company::create([
-                 'name' => $request->name,
-                 'user_id' => auth()->id(),
-                 'email' => $request->email,
-                 'phone_number' => $request->phone_number,
-                 'logo' => $logoPath,
-                 'creator_id' => auth()->id(),
-             ]);
-     
-             // Create the company location
-             CompanyLocation::create([
-                 'company_id' => $company->id,
-                 'district_id' => $request->district_id,
-                 'sub_location' => $request->sub_location,
-                 'creator_id' => auth()->id(),
-             ]);
-     
-             DB::commit(); // Commit transaction if everything is successful
-     
-             return response()->json([
-                 'success' => true,
-                 'message' => 'Company created successfully!',
-                 'redirect_url' => route('agent.company.edit', $company->id) // Redirect to edit page
-             ]);
-     
-         } catch (\Exception $e) {
-             DB::rollback(); // Rollback in case of error
-     
-             return response()->json([
-                 'success' => false,
-                 'message' => 'Something went wrong! ' . $e->getMessage()
-             ], 500);
-         }
-     }
-     
+    public function store(Request $request)
+    {
+
+        $user = Auth::user();
+
+        if ($user->company) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'You already have a registered company. Currently, only the main branch is supported.',
+
+                'redirect_url' => route('agent.company.edit', $user->company->id)
+            ], 400);
+        }
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:companies,email',
+            'phone_number' => 'required',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'district_id' => 'required|exists:districts,id',
+            'sub_location' => 'nullable|string|max:255',
+        ]);
+
+        DB::beginTransaction(); // Start Transaction
+
+        try {
+            // Handle logo upload
+            $logoPath = null;
+            if ($request->hasFile('logo')) {
+                $logoPath = $request->file('logo')->store('logos', 'public');
+            }
+
+            // Create the company
+            $company = Company::create([
+                'name' => $request->name,
+                'user_id' => auth()->id(),
+                'email' => $request->email,
+                'phone_number' => $request->phone_number,
+                'logo' => $logoPath,
+                'creator_id' => auth()->id(),
+            ]);
+
+            // Create the company location
+            CompanyLocation::create([
+                'company_id' => $company->id,
+                'district_id' => $request->district_id,
+                'sub_location' => $request->sub_location,
+                'creator_id' => auth()->id(),
+            ]);
+
+            DB::commit(); // Commit transaction if everything is successful
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Company created successfully!',
+                'redirect_url' => route('agent.company.edit', $company->id) // Redirect to edit page
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollback(); // Rollback in case of error
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong! ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 
     /**
      * Display the specified resource.
@@ -112,7 +123,7 @@ class CompanyController extends Controller
         $region = Region::orderBy('name')->get();
         $districts = District::orderBy('name')->get();
         $company = Company::findOrFail($id);
-        return view('company.edit', compact('region','districts','company'));
+        return view('company.edit', compact('region', 'districts', 'company'));
     }
 
     /**
@@ -128,9 +139,9 @@ class CompanyController extends Controller
             'district_id' => 'required|exists:districts,id',
             'sub_location' => 'nullable|string|max:255',
         ]);
-    
+
         DB::beginTransaction(); // Start a database transaction
-    
+
         try {
             // Handle logo update
             if ($request->hasFile('logo')) {
@@ -141,7 +152,7 @@ class CompanyController extends Controller
                 $logoPath = $request->file('logo')->store('logos', 'public');
                 $company->logo = $logoPath;
             }
-    
+
             // Update company details
             $company->update([
                 'name' => $request->name,
@@ -149,7 +160,7 @@ class CompanyController extends Controller
                 'phone_number' => $request->phone_number,
                 'updator_id' => auth()->id(),
             ]);
-    
+
             // Update or Create company location
             $company->location()->updateOrCreate(
                 ['company_id' => $company->id],
@@ -159,25 +170,25 @@ class CompanyController extends Controller
                     'updator_id' => auth()->id(),
                 ]
             );
-    
+
             DB::commit(); // Commit transaction if successful
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'Company updated successfully!',
-               
+
             ]);
-    
+
         } catch (\Exception $e) {
             DB::rollback(); // Rollback transaction in case of an error
-    
+
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong! ' . $e->getMessage()
             ], 500);
         }
     }
-    
+
     /**
      * Remove the specified resource from storage.
      */

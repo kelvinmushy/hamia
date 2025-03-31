@@ -18,8 +18,13 @@ class Company extends Model
     ];
 
     public function location()
-{
-    return $this->hasOne(CompanyLocation::class);
-}
+    {
+        return $this->hasOne(CompanyLocation::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
 }
