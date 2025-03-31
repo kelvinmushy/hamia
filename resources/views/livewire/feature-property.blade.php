@@ -19,12 +19,13 @@
           @foreach($properties as $property)
               <div class="col-lg-3 col-md-4 col-sm-6 px-1 py-1" style="margin-top: 0;"> <!-- Reduced margin-top for individual cards -->
                   <div class="card shadow-sm border-0 rounded-4 overflow-hidden property-card">
+                    <?php $x=$property->image;?>
                       <a href="/property/{{ str_slug($property->property_location->name) }}/{{$property->sub_category->slug}}/{{ str_slug($property->title) }}/{{$property->id }}" class="text-decoration-none">
                           
                           <!-- Property Image -->
                           {{-- <div class="property-image" style="background-image: url('{{ asset('images/agent/03122323145665865a5ea3215_74ca9ad50147d6b022ac7135dbfa366b.jpeg') }}');"></div>
                            --}}
-                          <img src="{{ asset('images/agent/03122323145665865a5ea3215_74ca9ad50147d6b022ac7135dbfa366b.jpeg') }}" 
+                          <img src="{{ asset($x = $property->image) }}" 
                                alt="Property Image" class="img-fluid property-img">
 
                           <div class="card-body p-2 text-dark">
