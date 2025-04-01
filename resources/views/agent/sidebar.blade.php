@@ -13,9 +13,10 @@
                     <small class="text-muted">{{ auth()->user()->email }}</small>
                 </div>
             </div>
-
+            
             <!-- Sidebar Menu with Dynamic Spacing -->
             <div class="sidebar-menu">
+                @if(auth()->user()->company)
                 <!-- Sidebar Item 1: My Advertisements -->
                 <div class="sidebar-item mb-2">
                     <a href="{{ route('agent.properties.index') }}" class="d-flex align-items-center text-dark">
@@ -73,7 +74,7 @@
                         <span>Social Media</span>
                     </a>
                 </div>
-
+               
                 <!-- Sidebar Item 6: Messages -->
                 <div class="sidebar-item mb-2">
                     <a href="{{ route('agent.message') }}" class="d-flex align-items-center text-dark">
@@ -83,14 +84,17 @@
                 </div>
 
                 <!-- Sidebar Item 7: Profile -->
+               
+                <!-- Sidebar Item 7: Profile -->
                 <div class="sidebar-item mb-2">
-                    <a href="{{ route('agent.company.edit', auth()->user()->company->id ?? '') }}"
+                    <a href="{{ route('agent.company.edit', auth()->user()->company->id) }}"
                         class="d-flex align-items-center text-dark">
                         <i class="fa fa-user me-2"></i>
                         <span>Profile</span>
                     </a>
                 </div>
-
+            @endif
+            
 
                 <!-- Sidebar Item 8: Change Password -->
                 <div class="sidebar-item mb-2">

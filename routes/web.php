@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\Companies\CompanyController;
+use App\Http\Controllers\Companies\Project\ProjectController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+
 
 
 use App\Http\Controllers\GoogleLoginController;
@@ -168,13 +170,7 @@ Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified'], 'as' =>
     Route::post('/company', [CompanyController::class, 'store'])->name('company.store'); // Store new company
     Route::get('/company/{company}/edit', [CompanyController::class, 'edit'])->name('company.edit'); // Edit company form
     
-    Route::post('/company/{company}/update', [CompanyController::class, 'update'])->name('company.update'); // Update company
-    
-    Route::get('/company/{company}', [CompanyController::class, 'show'])->name('company.show'); // Optional: Show company details
-    
-    Route::get('/properties/{id}/edit', 'App\Http\Controllers\Agent\PropertyController@update');
-
-
+   
 });
 
 Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified','hasCompany'], 'as' => 'agent.'], function () {
@@ -195,6 +191,15 @@ Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified','hasCompa
     // Route::resource('/company', CompanyController::class)->names([
     //     'index' => 'company.index',
     // ]);
+    Route::post('/company/{company}/update', [CompanyController::class, 'update'])->name('company.update'); // Update company
+    
+    Route::get('/company/{company}', [CompanyController::class, 'show'])->name('company.show'); // Optional: Show company details
+    
+    Route::get('/properties/{id}/edit', 'App\Http\Controllers\Agent\PropertyController@update');
+  
+    //Projects Controller will be Here
+     Route::resource('projects', ProjectController::class);
+
 
   
  
