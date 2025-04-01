@@ -7,8 +7,9 @@
             </div>
 
             <div class="modal-body">
-                <form id="projectForm" action="{{ route('agent.projects.store') }}" method="POST">
-                    @csrf
+                <form id="projectForm"  enctype="multipart/form-data">
+                    {{ csrf_field() }}  
+                    <input type="hidden" name="_method" id="formMethod" value="POST"> 
                     <input type="hidden" id="project_id" name="project_id">
 
                     <div class="mb-3">

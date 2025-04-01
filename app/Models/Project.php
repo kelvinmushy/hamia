@@ -26,5 +26,9 @@ class Project extends Model
         return $this->hasOne(ProjectPayment::class);
     }
     
-
+    public function repayments()
+    {
+        return $this->hasMany(ProjectRepayment::class);
+    }
+    
 }

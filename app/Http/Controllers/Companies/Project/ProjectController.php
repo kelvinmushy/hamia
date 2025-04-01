@@ -101,7 +101,7 @@ class ProjectController extends Controller
 
             //Create Project payment 
             ProjectPayment::create([
-                'project_id' =>$project->id,
+                'project_id' => $project->id,
                 'total_price' => $request->price,
                 'amount_paid' => $request->amount_paid,
                 'payment_type' => $request->payment_method,
@@ -137,7 +137,7 @@ class ProjectController extends Controller
     {
         $company = Auth::user()->company;
         $project = Project::where('company_id', $company->id)->findOrFail($id);
-        return view('projects.show', compact('project'));
+        return view('company.projects.show', compact('project'));
     }
 
     /**
@@ -159,6 +159,14 @@ class ProjectController extends Controller
     public function update(Request $request, $id)
     {
         $company = Auth::user()->company;
+
+        if (!$company) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not belong to a company.'
+            ], 403);
+        }
+
         $project = Project::where('company_id', $company->id)->findOrFail($id);
 
         $request->validate([
@@ -175,20 +183,22 @@ class ProjectController extends Controller
 
         try {
             // Handle image update
+            $imagePath = $project->image; // Keep old image by default
             if ($request->hasFile('image')) {
                 if ($project->image) {
                     Storage::delete('public/' . $project->image);
                 }
                 $imagePath = $request->file('image')->store('projects', 'public');
-                $project->image = $imagePath;
             }
 
             // Update project details
             $project->update([
                 'name' => $request->name,
+                'company_id' => $company->id, // Ensure it's still linked to the same company
                 'type' => $request->type,
                 'payment_method' => $request->payment_method,
                 'size_in_sq_m' => $request->size_in_sq_m,
+                'image' => $imagePath,
                 'updator_id' => Auth::id(),
             ]);
 
@@ -197,7 +207,21 @@ class ProjectController extends Controller
                 ['project_id' => $project->id],
                 [
                     'district_id' => $request->district_id,
-                    'sub_location' => $request->sub_location,
+                    'sub_location' => $request->address,
+                ]
+            );
+
+            // Update project payment
+            $project->payments()->updateOrCreate(
+                ['project_id' => $project->id],
+                [
+                    'total_price' => $request->price,
+                    'amount_paid' => $request->amount_paid,
+                    'payment_type' => $request->payment_method,
+                    'installment_period' => $request->payment_method === 'installment' ? $request->installment_period : null,
+                    'installment_amount' => $request->payment_method === 'installment' ? $request->installment_amount : null,
+                    'payment_status' => $this->getPaymentStatus($request->price, $request->amount_paid),
+                    'payment_date' => now(),
                 ]
             );
 
@@ -206,7 +230,7 @@ class ProjectController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Project updated successfully!',
-                'redirect_url' => route('projects.index'),
+                'redirect_url' => route('agent.projects.index'),
             ]);
 
         } catch (\Exception $e) {
@@ -218,6 +242,7 @@ class ProjectController extends Controller
             ], 500);
         }
     }
+
 
     /**
      * Delete a project owned by the company.

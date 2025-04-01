@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Companies\CompanyController;
 use App\Http\Controllers\Companies\Project\ProjectController;
+use App\Http\Controllers\Companies\Project\ProjectRepaymentController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -199,6 +200,9 @@ Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified','hasCompa
   
     //Projects Controller will be Here
      Route::resource('projects', ProjectController::class);
+   //Repayment Form
+   // routes/web.php
+   Route::post('/projects/repayment', [ProjectRepaymentController::class, 'store'])->name('projects.repayment.store');
 
 
   
