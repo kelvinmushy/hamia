@@ -2,10 +2,13 @@
 
 use App\Http\Controllers\Companies\CompanyController;
 use App\Http\Controllers\Companies\Project\ProjectController;
+use App\Http\Controllers\Companies\Project\ProjectDivisionController;
 use App\Http\Controllers\Companies\Project\ProjectRepaymentController;
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+
 
 
 
@@ -170,11 +173,11 @@ Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified'], 'as' =>
     Route::get('/region/district', [App\Http\Controllers\AjaxFormContentController::class, 'getDistrict']);
     Route::post('/company', [CompanyController::class, 'store'])->name('company.store'); // Store new company
     Route::get('/company/{company}/edit', [CompanyController::class, 'edit'])->name('company.edit'); // Edit company form
-    
-   
+
+
 });
 
-Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified','hasCompany'], 'as' => 'agent.'], function () {
+Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified', 'hasCompany'], 'as' => 'agent.'], function () {
 
     Route::get('dashboard', [App\Http\Controllers\Agent\DashboardController::class, 'index'])->name('dashboard');
     Route::get('profile', [App\Http\Controllers\Agent\DashboardController::class, 'profile'])->name('profile');
@@ -193,20 +196,32 @@ Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified','hasCompa
     //     'index' => 'company.index',
     // ]);
     Route::post('/company/{company}/update', [CompanyController::class, 'update'])->name('company.update'); // Update company
-    
+
     Route::get('/company/{company}', [CompanyController::class, 'show'])->name('company.show'); // Optional: Show company details
-    
+
     Route::get('/properties/{id}/edit', 'App\Http\Controllers\Agent\PropertyController@update');
-  
+
     //Projects Controller will be Here
-     Route::resource('projects', ProjectController::class);
-   //Repayment Form
-   // routes/web.php
-   Route::post('/projects/repayment', [ProjectRepaymentController::class, 'store'])->name('projects.repayment.store');
+    Route::resource('projects', ProjectController::class);
+    //Repayment Form
+    // routes/web.php
+    Route::post('/projects/repayment', [ProjectRepaymentController::class, 'store'])->name('projects.repayment.store');
+
+    //Project Division
+    // Project Division Routes
+    Route::get('/project/{name}/{type}/{id}', [ProjectDivisionController::class, 'index'])->name('project.division.index');
+
+    // Store Project Division
+    Route::post('/project/division/store', [ProjectDivisionController::class, 'store'])->name('project.division.store');
+
+    // Update Project Division
+    Route::put('/project/division/{id}/update', [ProjectDivisionController::class, 'update'])->name('project.division.update');
 
 
-  
- 
+// Delete Project Division
+   Route::delete('/project/division/{id}/destroy', [ProjectDivisionController::class, 'destroy'])->name('project.division.destroy');
+
+
     //store multiple Images
     Route::post('/update/properties', 'App\Http\Controllers\Agent\PropertyController@update');
 
@@ -221,7 +236,7 @@ Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified','hasCompa
     Route::post('properties/gallery/delete', 'PropertyController@galleryImageDelete')->name('gallery-delete');
 
     Route::get('/subcategory/propertyType', [App\Http\Controllers\AjaxFormContentController::class, 'propertyType']);
-   
+
 
     Route::post('properties/gallery/delete', 'PropertyController@galleryImageDelete')->name('gallery-delete');
 

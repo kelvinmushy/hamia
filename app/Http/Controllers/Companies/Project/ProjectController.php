@@ -66,7 +66,7 @@ class ProjectController extends Controller
             'name' => 'required|string|max:255',
             'district_id' => 'required|exists:districts,id',
             'sub_location' => 'nullable|string|max:255',
-            'type' => 'required|in:residential,farm_land',
+            'type' => 'required|in:residential,farm_land,mixed',
             'payment_method' => 'required|in:cash,installment',
             'size_in_sq_m' => 'required|numeric|min:1',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -88,6 +88,8 @@ class ProjectController extends Controller
                 'type' => $request->type,
                 'payment_method' => $request->payment_method,
                 'size_in_sq_m' => $request->size_in_sq_m,
+                'residential_size' => $request->residential_size,
+                'farm_size' => $request->farm_size,
                 'image' => $imagePath,
                 'creator_id' => Auth::id(),
             ]);
@@ -173,7 +175,7 @@ class ProjectController extends Controller
             'name' => 'required|string|max:255',
             'district_id' => 'required|exists:districts,id',
             'sub_location' => 'nullable|string|max:255',
-            'type' => 'required|in:residential,farm_land',
+            'type' => 'required|in:residential,farm_land,mixed',
             'payment_method' => 'required|in:cash,installment',
             'size_in_sq_m' => 'required|numeric|min:1',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -198,6 +200,8 @@ class ProjectController extends Controller
                 'type' => $request->type,
                 'payment_method' => $request->payment_method,
                 'size_in_sq_m' => $request->size_in_sq_m,
+                'residential_size' => $request->residential_size,
+                'farm_size' => $request->farm_size,
                 'image' => $imagePath,
                 'updator_id' => Auth::id(),
             ]);
@@ -271,5 +275,26 @@ class ProjectController extends Controller
             return 'pending';  // No Payment Made Yet
         }
     }
-
+   
+   
+    public function showLandDetails($id, $type)
+    {
+        $project = Project::findOrFail($id);
+    
+        // Determine which land type (residential or farm) and get its details
+        if ($type == 'mixed') {
+            $landDetails = [
+                'size' => $project->residential_size,
+                'price' => $project->residential_price, // Assuming you have a price field for residential land
+            ];
+        } elseif ($type == 'farm') {
+            $landDetails = [
+                'size' => $project->farm_size,
+                'price' => $project->farm_price, // Assuming you have a price field for farm land
+            ];
+        }
+    
+        return view('company.project.land_details', compact('landDetails'));
+    }
+    
 }

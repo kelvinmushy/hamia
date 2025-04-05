@@ -27,16 +27,124 @@
                                     </tr>
                                     <tr>
                                         <td>Ukubwa wa Eneo (m²)</td>
-                                        <td>{{ $project->size_in_sq_m }}</td>
+                                        @if($project->type == "mixed")
+                                            <td>
+                                                {{ $project->size_in_sq_m }} m²
+                                            </td>
+                                        @else
+                                            <td> <a href="{{url('agent/project/' . Str::slug($project->name) . '/' . $project->type . '/' . $project->id)}}"
+                                                    class="btn btn-info">
+                                                    {{ $project->size_in_sq_m }} m²
+                                                </a></td>
+                                        @endif
                                     </tr>
-                                    <tr>
-                                        <td>Ukubwa wa Eneo la Makazi (m²)</td>
-                                        <td>{{ $project->residential_size }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Ukubwa wa Eneo la Mashamba (m²)</td>
-                                        <td>{{ $project->farm_size }}</td>
-                                    </tr>
+                                    @if($project->type == "mixed")
+                                        <tr>
+                                            <td>Ukubwa wa Eneo la Makazi (m²)</td>
+                                            <td>
+                                                @if($project->residential_size !== null)
+                                                    <a href="{{ route('agent.project.division.index', [Str::slug($project->name), 'residential', $project->id]) }}"
+                                                        class="btn btn-info">
+                                                        {{ $project->residential_size }} m²
+                                                        </a>
+
+
+                                                @endif
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Ukubwa wa Eneo la Mashamba (m²)</td>
+                                            <td>
+                                                @if($project->farm_size !== null)
+                                                    <a href="{{ route('agent.project.division.index', [Str::slug($project->name), 'farm_land', $project->id]) }}" class="btn btn-info">
+                                                    {{ $project->farm_size }} m²
+                                                    </a>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        {{--
+                                        <tr>
+                                            <td>Ukubwa wa Eneo la Viwanda (m²)</td>
+                                            <td>
+                                                @if($project->industrial_size !== null)
+                                                <a href="{{ url('project_name/industrial/') }}" class="btn btn-info">
+                                                    {{ $project->industrial_size }} m²
+                                                </a>
+                                                @endif
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Ukubwa wa Eneo la Biashara (m²)</td>
+                                            <td>
+                                                @if($project->commercial_size !== null)
+                                                <a href="{{ url('project_name/commercial/') }}" class="btn btn-info">
+                                                    {{ $project->commercial_size }} m²
+                                                </a>
+                                                @endif
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Ukubwa wa Eneo la Burudani (m²)</td>
+                                            <td>
+                                                @if($project->recreational_size !== null)
+                                                <a href="{{ url('project_name/recreational/') }}" class="btn btn-info">
+                                                    {{ $project->recreational_size }} m²
+                                                </a>
+                                                @endif
+                                            </td>
+                                        </tr>
+
+
+
+                                        <tr>
+                                            <td>Ukubwa wa Eneo la Taasisi (m²)</td>
+                                            <td>
+                                                @if($project->institutional_size !== null)
+                                                <a href="{{ url('project_name/institutional/') }}" class="btn btn-info">
+                                                    {{ $project->institutional_size }} m²
+                                                </a>
+                                                @endif
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Ukubwa wa Eneo la Usafiri (m²)</td>
+                                            <td>
+                                                @if($project->transportation_size !== null)
+                                                <a href="{{ url('project_name/transportation/') }}" class="btn btn-info">
+                                                    {{ $project->transportation_size }} m²
+                                                </a>
+                                                @endif
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Ukubwa wa Eneo la Uhifadhi (m²)</td>
+                                            <td>
+                                                @if($project->conservation_size !== null)
+                                                <a href="{{ url('project_name/conservation/') }}" class="btn btn-info">
+                                                    {{ $project->conservation_size }} m²
+                                                </a>
+                                                @endif
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Ukubwa wa Eneo la Uwanja Bure (m²)</td>
+                                            <td>
+                                                @if($project->vacant_size !== null)
+                                                <a href="{{ url('project_name/vacant/') }}" class="btn btn-info">
+                                                    {{ $project->vacant_size }} m²
+                                                </a>
+                                                @endif
+
+                                            </td>
+                                        </tr> --}}
+
+                                    @endif
                                 </tbody>
                             </table>
 
@@ -131,7 +239,7 @@
                                         <th>Kiasi cha Malipo</th>
                                         <th>Aina ya Malipo</th>
                                         <th>Salio Liliobakia</th>
-                                    </tr>
+                                        </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($project->repayments as $index => $repayment)
@@ -139,7 +247,7 @@
                                             <td>{{ $index + 1 }}</td>
                                             <td>{{ \Carbon\Carbon::parse($repayment->payment_date)->format('d M Y') }}</td>
                                             <td>{{ number_format($repayment->payment_amount, 2) }}</td>
-                                            <td>{{ ucfirst($repayment->payment_method) }}</td>
+                                                    <td>{{ ucfirst($repayment->payment_method) }}</td>
                                             <td>{{ number_format($repayment->remaining_balance, 2) }}</td>
                                         </tr>
                                     @endforeach
@@ -147,7 +255,8 @@
                             </table>
 
                             <!-- Back to Project List -->
-                            <a href="{{ route('agent.projects.index') }}" class="btn btn-secondary">Rudi kwenye Orodha ya Miradi</a>
+                            <a href="{{ route('agent.projects.index') }}" class="btn btn-secondary">Rudi kwenye Orodha ya
+                                Miradi</a>
                         </div>
                     </div>
                 </div>

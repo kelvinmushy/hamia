@@ -30,5 +30,11 @@ class Project extends Model
     {
         return $this->hasMany(ProjectRepayment::class);
     }
+
+
+    public function divisions()
+    {
+        return $this->hasMany(ProjectDivision::class);
+    }
     
 }
