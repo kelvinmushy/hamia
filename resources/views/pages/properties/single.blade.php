@@ -349,13 +349,13 @@
                     <div class="card member-card">
                         <div class="card member-card">
                             <div class="header l-parpl">
-                                <a href="/agents/{{$property->user->id}}"><h4 class="m-t-10">{{ $property->user->username}}</h4></a>
+                                <a href="/agents/{{$property->company->id}}"><h4 class="m-t-10">{{ $property->company->name}}</h4></a>
                             </div>
                             <div class="member-img">
-                                <a href="/agents/{{$property->user->id}}" class="profile-image-wrapper">
-                                    <img src="{{ url(isset($property->user->image) ? $property->user->image : 'images/noimage.jpg') }}" 
+                                <a href="/agents/{{$property->company->id}}" class="profile-image-wrapper">
+                                    <img src="{{ url(isset($property->company->logo) ? $property->company->logo : 'images/noimage.jpg') }}" 
                                          class="profile-image" 
-                                         alt="{{ $property->user->username }}'s profile picture">
+                                         alt="{{ $property->company->name }}'s profile picture">
                                 </a>
                             </div>
                             <!-- Rest of your card content -->
@@ -363,25 +363,25 @@
                         <div class="body">
                             <div class="col-12">
                                 <ul class="social-links list-unstyled">
-                                    @foreach(@$property->user->user_social_media as $social)
+                                    @foreach(@$property->company->company_social_media as $social)
                                     <li><a title="{{$social->social_media->name}}" href="{{@$social->url}}"><i class="{{$social->social_media->icon}}"></i></a></li>
                                     @endforeach
                                 </ul>
                                 
-                                @if(@$property->user->email)
+                                @if(@$property->company->email)
                                 <p class="text-muted" style="text-align: center;">
-                                    <i class="zmdi zmdi-email"> {{@$property->user->email}}</i>
+                                    <i class="zmdi zmdi-email"> {{@$property->company->email}}</i>
                                 </p>
                                 @endif
                                 
-                                @if(@$property->user->phone_number)
+                                @if(@$property->company->phone_number)
                                 <p class="text-muted" style="text-align: center;">
-                                    <i class="zmdi zmdi-phone"> {{@$property->user->phone_number}}</i>
+                                    <i class="zmdi zmdi-phone"> {{@$property->company->phone_number}}</i>
                                 </p>
                                 @endif
                                 
                                 <p class="text-muted" style="text-align: center;">
-                                    <i class="zmdi zmdi-pin-drop"> {{@$property->user->user_location->sub_location}},{{@$property->user->user_location->district->name}},{{@$property->user->user_location->district->region->name}}</i>
+                                    <i class="zmdi zmdi-pin-drop"> {{@$property->company->company_location->sub_location}},{{@$property->company->company_location->district->name}},{{@$property->company->company_location->district->region->name}}</i>
                                 </p>
                             </div>
                             <hr>
@@ -398,7 +398,7 @@
                                 <form id="form-message" data-toggle="validator" enctype="multipart/form-data">
                                     {{ csrf_field() }} {{ method_field('POST') }}
                                     <div class="form-group">
-                                        <input type="hidden" name="agent_id" class="form-control" value="{{$property->user->id}}" required>
+                                        <input type="hidden" name="agent_id" class="form-control" value="{{$property->company->id}}" required>
                                         <input type="text" class="form-control" placeholder="Name" name="name" required>
                                     </div>
                                     <div class="form-group">

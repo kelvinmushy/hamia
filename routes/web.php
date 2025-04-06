@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\Companies\CompanyController;
+use App\Http\Controllers\Companies\ManageUnit\UnitController;
 use App\Http\Controllers\Companies\Project\ProjectController;
 use App\Http\Controllers\Companies\Project\ProjectDivisionController;
 use App\Http\Controllers\Companies\Project\ProjectRepaymentController;
+
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -220,7 +222,9 @@ Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified', 'hasComp
 
 // Delete Project Division
    Route::delete('/project/division/{id}/destroy', [ProjectDivisionController::class, 'destroy'])->name('project.division.destroy');
-
+  //Project manage  Unity
+    Route::resource('project/units', UnitController::class);
+  
 
     //store multiple Images
     Route::post('/update/properties', 'App\Http\Controllers\Agent\PropertyController@update');

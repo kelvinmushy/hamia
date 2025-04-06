@@ -45,39 +45,58 @@ class PropertyController extends Controller
 
   public function index()
   {
-    $properties = Property::latest()->withCount('comments')->where('agent_id', Auth::id())
+    $company = Auth::user()->company;
+
+    if (!$company) {
+        return redirect()->route('dashboard')->with('error', 'You do not belong to a company.');
+    }
+
+    $properties = Property::latest()->withCount('comments')->where('company_id', $company->id)
       ->paginate(10);
 
     return view('agent.properties.index', compact('properties'));
   }
   public function create()
-  {
-    $check_user = User::where('id', Auth::id())->first();
+{
+    // Get the authenticated user
+    $user = Auth::user();
 
-    if ($check_user->image == "" || $check_user->phone_number == "" || $check_user->about == "" || $check_user->user_location == "") {
-      $profile = Auth::user();
-      $region = Region::orderBy('name')->get();
-      $district = District::orderBy('name')->get();
-      return view('agent.profile', compact('profile', 'region', 'district'));
-    } else {
-      $features = Feature::orderBy('name')->get();
-      $district = District::orderBy('name')->get();
-      $currency = Currency::orderBy('name')->get();
-      $category = Category::orderBy('name')->get();
-      $condition = Condition::orderBy('name')->get();
-      $furnish = Furnish::orderBy('name')->get();
-      $sub_category = SubCategory::orderBy('name')->get();
-      $terms = Term::orderBy('name')->get();
-      $region = Region::orderBy('name')->get();
+    // Retrieve the company that the authenticated user belongs to
+    $company = $user->company;
 
-      $property_purpose = PropertyPurpose::orderBy('name')->get();
-
-      $property_type = PropertyType::orderBy('name')->get();
-      $nearBye = NearBye::orderBy('name')->get();
-      $property_title = PropertyTitle::orderBy('name')->get();
-      return view('agent.properties.create', compact('condition', 'furnish', 'features', 'region', 'property_type', 'property_purpose', 'nearBye', 'property_title', 'category', 'currency', 'district', 'terms', 'sub_category'));
+    if (!$company) {
+        return redirect()->route('home')->with('error', 'Company not found!');
     }
-  }
+
+    // Check if the company's profile is complete (based on some criteria)
+    if ($company->logo == "" || $company->phone_number == "" || $company->about == "" || $company->location->sub_location == "") {
+        // Pass company to the profile view for editing
+        $profile = $company;
+        $region = Region::orderBy('name')->get();
+        $district = District::orderBy('name')->get();
+        return view('agent.profile', compact('profile', 'region', 'district'));
+    } else {
+        // If the company profile is complete, proceed to create property
+        $features = Feature::orderBy('name')->get();
+        $district = District::orderBy('name')->get();
+        $currency = Currency::orderBy('name')->get();
+        $category = Category::orderBy('name')->get();
+        $condition = Condition::orderBy('name')->get();
+        $furnish = Furnish::orderBy('name')->get();
+        $sub_category = SubCategory::orderBy('name')->get();
+        $terms = Term::orderBy('name')->get();
+        $region = Region::orderBy('name')->get();
+
+        $property_purpose = PropertyPurpose::orderBy('name')->get();
+
+        $property_type = PropertyType::orderBy('name')->get();
+        $nearBye = NearBye::orderBy('name')->get();
+        $property_title = PropertyTitle::orderBy('name')->get();
+
+        return view('agent.properties.create', compact('condition', 'furnish', 'features', 'region', 'property_type', 'property_purpose', 'nearBye', 'property_title', 'category', 'currency', 'district', 'terms', 'sub_category'));
+    }
+}
+
 
 
   public function store(Request $request)
@@ -164,7 +183,7 @@ class PropertyController extends Controller
       'category_id' => 1,
       'sub_category_id' => $request->sub_category_id,
       'currency_id' => $request->currency_id,
-      'agent_id' => Auth::id(),
+      'company_id' => Auth::user()->company->id,
       'description' => $request->description,
     ]);
     $property->save();

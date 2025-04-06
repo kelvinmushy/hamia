@@ -48,14 +48,14 @@
                                 <div class="carousel-item active">
                                 <img  src="{{asset($g->path)}}" class="img-fluid" alt="">
                                 <div class="carousel-caption">
-                                  <h3>{{@$property->property_location->region->name}},{{@$property->property_location->name}},Tanzania</h3>
+                                  <h3>{{@$property->property_company->region->name}},{{@$property->property_company->name}},Tanzania</h3>
                                 </div>
                                  </div>
                               @else
                                <div class="carousel-item">
                                 <img src="{{asset(@$g->path)}}" class="img-fluid" alt="">
                                 <div class="carousel-caption">
-                                    <h3>{{@$property->property_location->region->name}},{{@$property->property_location->name}},Tanzania</h3>
+                                    <h3>{{@$property->property_company->region->name}},{{@$property->property_company->name}},Tanzania</h3>
                                   
                                 </div>
                             </div>
@@ -94,7 +94,7 @@
                                          <small class="text text-danger">Not Available</small>
                                       @endif
                                 </span></h4>
-                                <p class="text-muted"><i class="zmdi zmdi-pin m-r-5"></i>{{@$property->property_location->region->name}},{{@$property->property_location->name}},Tanzania</p>
+                                <p class="text-muted"><i class="zmdi zmdi-pin m-r-5"></i>{{@$property->property_company->region->name}},{{@$property->property_company->name}},Tanzania</p>
                                 <p class="text-muted m-b-0">{{$property->description }}</p>
                             </div>
                            
@@ -165,10 +165,10 @@
             <div class="col-lg-4 col-md-12">
                 <div class="card member-card">
                     <div class="header l-parpl">
-                        <h4 class="m-t-10">{{ $property->user->username}}</h4>
+                        <h4 class="m-t-10">{{ $property->company->companyname}}</h4>
                     </div>
                     <div class="member-img">
-                        <a href="/agents/{{$property->user->id}}"><img src="{{ url(isset($property->user->image) ? $property->user->image : 'images/noimage.jpg') }}" class="rounded-circle" alt="profile-image"></a>
+                        <a href="/agents/{{$property->company->id}}"><img src="{{ url(isset($property->company->logo) ? $property->company->logo : 'images/noimage.jpg') }}" class="rounded-circle" alt="profile-image"></a>
                     </div>
                     <div class="body">
                         <div class="col-12">
@@ -177,18 +177,18 @@
                                 <li><a title="twitter" href="#"><i class="zmdi zmdi-twitter"></i></a></li>
                                 <li><a title="instagram" href="#"><i class="zmdi zmdi-instagram"></i></a></li>
                             </ul>
-                            @if(@$property->user->email) 
+                            @if(@$property->company->email) 
                             <p class="text-muted" style="text-align: center;">
-                             <i class="zmdi zmdi-email"> {{@$property->user->email}}</i>
+                             <i class="zmdi zmdi-email"> {{@$property->company->email}}</i>
                             </p>
                              @endif
-                                 @if(@$property->user->phone_number) 
+                                 @if(@$property->company->phone_number) 
                             <p class="text-muted" style="text-align: center;">
-                             <i class="zmdi zmdi-phone"> {{@$property->user->phone_number}}</i>
+                             <i class="zmdi zmdi-phone"> {{@$property->company->phone_number}}</i>
                             </p>
                                 @endif
                               <p class="text-muted" style="text-align: center;">
-                                 <i class="zmdi zmdi-pin-drop"> {{@$property->user->user_location->sub_location}},{{@$property->user->user_location->district->name}},{{@$property->user->user_location->district->region->name}}</i></p>
+                                 <i class="zmdi zmdi-pin-drop"> {{@$property->company->location->sub_location}},{{@$property->company->location->district->name}},{{@$property->company->location->district->region->name}}</i></p>
                         </div>
                         
                        

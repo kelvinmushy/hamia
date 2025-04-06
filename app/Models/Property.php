@@ -7,16 +7,16 @@ class Property extends Model
     protected $fillable = [
         'title',    'price',     
         'featured',  'type_id','image',
-        'agent_id',     'description',   
+        'company_id',     'description',   
         'category_id','term_id','currency_id','sub_category_id'
         
     ];
 
  
 
-    public function user()
+    public function company()
     {
-        return $this->belongsTo(User::class,'agent_id');
+        return $this->belongsTo(Company::class);
     }
 
     public function gallery()

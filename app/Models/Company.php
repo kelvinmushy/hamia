@@ -27,4 +27,10 @@ class Company extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function company_social_media()
+    {
+        return  $this->hasMany('App\Models\CompanySocialMedia');
+    }
+
+
 }

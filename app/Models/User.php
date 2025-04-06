@@ -44,20 +44,14 @@ class User extends Authenticatable  implements MustVerifyEmail
         return $this->role->name;
     } 
 
-      public function user_location()
-    {
-        return  $this->hasOne('App\Models\UserLocation', 'user_id');
-    }
+    
     
         public function agent_property()
     {
         return  $this->hasMany('App\Models\Property', 'agent_id');
     }
 
-    public function user_social_media()
-    {
-        return  $this->hasMany('App\Models\UserSocialMedia', 'user_id');
-    }
+   
 
     public function totalAdd($id){
         $total=DB::table('properties')->where('agent_id',$id)->count();

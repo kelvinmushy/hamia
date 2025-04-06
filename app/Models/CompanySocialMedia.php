@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserSocialMedia extends Model
+class CompanySocialMedia extends Model
 {
    
   protected $fillable = [
-        'user_id', 'url','social_media_id','creator_id','updator_id'
+        'company_id', 'url','social_media_id','creator_id','updator_id'
     ];
     
       public function social_media(){

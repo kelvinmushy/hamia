@@ -10,11 +10,11 @@ use Intervention\Image\Facades\Image;
 use App\Mail\Contact;
 use Carbon\Carbon;
 use App\Models\Property;
-use App\Models\UserLocation;
+use App\Models\CompanyLocation;
 use App\Models\Region;
 use App\Models\Message;
 use App\Models\SocialMedia;
-use App\Models\UserSocialMedia;
+use App\Models\CompanySocialMedia;
 use App\Models\User;
 use App\Models\District;
 use Auth;
@@ -23,129 +23,140 @@ use Toastr;
 
 class DashboardController extends Controller
 {
-      use Traits\CheckProfileTraits;
+    use Traits\CheckProfileTraits;
 
-      public function index()
-      { 
-        
-        //dd(566); 
-        $check_user=User::where('id',Auth::id())->first();
-        if($check_user->image==""||$check_user->phone_number==""||$check_user->about==""||$check_user->user_location==""){
-             $profile = Auth::user();
-             $region=Region::orderBy('name')->get();
-             $district=District::orderBy('name')->get();
-             return view('agent.profile',compact('profile','region','district'));
+    public function index()
+    { 
+        // Get the company_id from the authenticated user's associated company
+        $company_id = Auth::user()->company->id;
+
+        // Check if the company has a complete profile
+        $check_company = Company::where('id', $company_id)->first();
+        if ($check_company->image == "" || $check_company->phone_number == "" || $check_company->about == "" || $check_company->company_location == "") {
+            $profile = Auth::user();
+            $region = Region::orderBy('name')->get();
+            $district = District::orderBy('name')->get();
+            return view('agent.profile', compact('profile', 'region', 'district'));
         }
-       
 
-        $properties    = Property::latest()->where('agent_id', Auth::id())->take(5)->get();
-        $propertytotal = Property::latest()->where('agent_id', Auth::id())->count();
-        $region=Region::orderBy('name')->get();
-        $messages      = Message::latest()->where('agent_id', Auth::id())->take(5)->get();
-        $messagetotal  = Message::latest()->where('agent_id', Auth::id())->count();
-         return view('agent.dashboard',compact('properties','propertytotal','messages','messagetotal','region'));
-       }
+        // Use company_id to fetch properties and messages
+        $properties = Property::latest()->where('company_id', $company_id)->take(5)->get();
+        $propertytotal = Property::latest()->where('company_id', $company_id)->count();
+        $region = Region::orderBy('name')->get();
+        $messages = Message::latest()->where('company_id', $company_id)->take(5)->get();
+        $messagetotal = Message::latest()->where('company_id', $company_id)->count();
 
-      public function profile()
-      {
+        return view('agent.dashboard', compact('properties', 'propertytotal', 'messages', 'messagetotal', 'region'));
+    }
+
+    public function profile()
+    {
         $profile = Auth::user();
-          $region=Region::orderBy('name')->get();
-          $district = District::orderBy('name')->get();
-        return view('agent.profile',compact('profile','region','district'));
-      }
-       public function social()
-      {
-         $user_id=Auth::user()->id;
-         $user_social=UserSocialMedia::where('user_id',$user_id)->get();
-         $profile = Auth::user();
-         $social=SocialMedia::orderBy('name')->get();
-         return view('agent.social_media.index',compact('social','user_social'));
-     }
-      public function social_store(Request $request)
-      {
-        $user_id=Auth::user()->id;
-          $request->validate([
-            'social_media_id'      => 'required',
-            'social_link'  => 'required',
-         
-          ]);
+        $region = Region::orderBy('name')->get();
+        $district = District::orderBy('name')->get();
+        return view('agent.profile', compact('profile', 'region', 'district'));
+    }
 
-           $data =UserSocialMedia::updateOrCreate([
-            'user_id' => $user_id,'social_media_id'=>$request->social_media_id
-        ], [
-             'user_id' => $user_id,'social_media_id'=>$request->social_media_id,
-             'url' =>$request->social_link,
+    public function social()
+    {
+        $company_id = Auth::user()->company->id; // Get the company_id from the user
+
+        // Get social media accounts related to the company
+        $user_social = CompanySocialMedia::where('company_id', $company_id)->get();
+        $profile = Auth::user();
+        $social = SocialMedia::orderBy('name')->get();
+
+        return view('agent.social_media.index', compact('social', 'user_social'));
+    }
+
+    public function social_store(Request $request)
+    {
+        $company_id = Auth::user()->company->id; // Get the company_id from the user
+
+        $request->validate([
+            'social_media_id' => 'required',
+            'social_link' => 'required',
         ]);
-           return redirect()->back()->with('success', 'Social Media Updated');  
-      }
-      public function social_delete($id){
-                UserSocialMedia::where('id',$id)->delete();
-              return redirect()->back()->with('success', 'Social Media Accout Deleted');  
-      }
- 
+
+        // Store the social media data for the company instead of the user
+        $data = CompanySocialMedia::updateOrCreate([
+            'company_id' => $company_id, 'social_media_id' => $request->social_media_id
+        ], [
+            'company_id' => $company_id, 'social_media_id' => $request->social_media_id,
+            'url' => $request->social_link,
+        ]);
+
+        return redirect()->back()->with('success', 'Social Media Updated');
+    }
+
+    public function social_delete($id)
+    {
+        CompanySocialMedia::where('id', $id)->delete();
+        return redirect()->back()->with('success', 'Social Media Account Deleted');
+    }
+
     public function profileUpdate(Request $request)
     {
         $request->validate([
-            'name'      => 'required',
-            'username'  => 'required',
-            'phone_number'  => 'required',
-            'email'     => 'required|email',
-            'image'     => 'image|mimes:jpeg,jpg,png',
-            'about'     => 'max:250'
+            'name' => 'required',
+            'phone_number' => 'required',
+            'email' => 'required|email',
+            'image' => 'image|mimes:jpeg,jpg,png',
+            'about' => 'max:250'
         ]);
-
-        $user = User::find(Auth::id());
-
-     
+    
+        // Get the company associated with the authenticated user
+        $company = Auth::user()->company;
+    
+        // Check if a file has been uploaded
         $image = $request->file('image');
-        $slug  = str_slug($request->title_id);
-
-        if (request()->hasFile('image')){
-
-            $path = 'images/agent/';
-            $filename = uniqid(date('Hmdysi')) . '_' .  $image->getClientOriginalName();
-            $upload =  $request->file('image')->move($path, $filename);
+        if (request()->hasFile('image')) {
+            $path = 'images/company/';
+            $filename = uniqid(date('Hmdysi')) . '_' . $image->getClientOriginalName();
+            $upload = $request->file('image')->move($path, $filename);
             if ($upload) {
-                $image= $path . $filename;
+                $image = $path . $filename;
             }
-            
+        } else {
+            // If no image uploaded, retain the current image
+            $image = $company->logo;
         }
-        $user->name = $request->name;
-        $user->username = $request->username;
-        $user->email = $request->email;
-        $user->image =   $image;
-        $user->phone_number=$request->phone_number;
-        $user->about = $request->about;
-
-        $user->save();
-
-         $user_location=new UserLocation();
-         $user_location->district_id = $request->district_id;
-         $user_location->sub_location= $request->sub_location;
-         $user_location->updator_id=Auth::user()->id;
-          $user_location->user_id=Auth::user()->id;
-         $user_location->save();
-        return back();
+    
+        // Update the company's basic info (name, email, phone, etc.)
+        $company->name = $request->name;
+        $company->email = $request->email;
+        $company->logo = $image; // Here we save the image as the company logo
+        $company->phone_number = $request->phone_number;
+        $company->about = $request->about; // Assuming you have a column for "about" in the Company model
+    
+        $company->save();
+    
+        // Now save the location details under company_id in the CompanyLocation model
+        $company_location = $company->location ?? new CompanyLocation(); // Fetch existing location or create a new one
+    
+        $company_location->district_id = $request->district_id;
+        $company_location->sub_location = $request->sub_location;
+        $company_location->updator_id = Auth::user()->id; // Save the updater ID (user ID)
+        $company_location->company_id = $company->id; // Link the location to the company
+        $company_location->save();
+    
+        return back()->with('success', 'Company profile updated successfully.');
     }
-
-
     
     public function changePassword()
     {
         return view('agent.changepassword');
-
     }
 
     public function changePasswordUpdate(Request $request)
     {
         if (!(Hash::check($request->get('currentpassword'), Auth::user()->password))) {
-
-            Toastr::error('message', 'Your current password does not matches with the password you provided! Please try again.');
+            Toastr::error('message', 'Your current password does not match the password you provided! Please try again.');
             return redirect()->back();
         }
-        if(strcmp($request->get('currentpassword'), $request->get('newpassword')) == 0){
 
-            Toastr::error('message', 'New Password cannot be same as your current password! Please choose a different password.');
+        if (strcmp($request->get('currentpassword'), $request->get('newpassword')) == 0) {
+            Toastr::error('message', 'New Password cannot be the same as your current password! Please choose a different password.');
             return redirect()->back();
         }
 
@@ -162,56 +173,67 @@ class DashboardController extends Controller
         return redirect()->back();
     }
 
-
-
     // MESSAGE
     public function message()
     {
-        $messages = Message::latest()->where('agent_id', Auth::id())->paginate(10);
+        $company_id = Auth::user()->company->id; // Get company_id
 
-        return view('agent.messages.index',compact('messages'));
+        // Get messages related to the company
+        $messages = Message::latest()->where('company_id', $company_id)->paginate(10);
+
+        return view('agent.messages.index', compact('messages'));
     }
 
     public function messageRead($id)
     {
         $message = Message::findOrFail($id);
 
-        return view('agent.messages.read',compact('message'));
+        return view('agent.messages.read', compact('message'));
     }
 
     public function messageReplay($id)
     {
         $message = Message::findOrFail($id);
 
-        return view('agent.messages.replay',compact('message'));
+        return view('agent.messages.replay', compact('message'));
     }
 
     public function messageSend(Request $request)
     {
+        $company_id = Auth::user()->company->id; // Get company_id
+
         $request->validate([
-            'agent_id'  => 'required',
-            'user_id'   => 'required',
-            'name'      => 'required',
-            'email'     => 'required',
-            'phone'     => 'required',
-            'message'   => 'required'
+            'agent_id' => 'required',
+            'user_id' => 'required',
+            'name' => 'required',
+            'email' => 'required',
+            'phone' => 'required',
+            'message' => 'required'
         ]);
 
-        Message::create($request->all());
+        // Create a message with the company_id
+        Message::create([
+            'company_id' => $company_id,
+            'agent_id' => $request->agent_id,
+            'user_id' => $request->user_id,
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'message' => $request->message,
+        ]);
 
-        Toastr::success('message', 'Message send successfully.');
+        Toastr::success('message', 'Message sent successfully.');
         return back();
-
     }
 
     public function messageReadUnread(Request $request)
     {
         $status = $request->status;
-        $msgid  = $request->messageid;
+        $msgid = $request->messageid;
 
-        if($status){
+        if ($status) {
             $status = 0;
-        }else{
+        } else {
             $status = 1;
         }
 
@@ -231,17 +253,15 @@ class DashboardController extends Controller
         return back();
     }
 
-
     public function contactMail(Request $request)
     {
-        $message  = $request->message;
-        $name     = $request->name;
+        $message = $request->message;
+        $name = $request->name;
         $mailfrom = $request->mailfrom;
 
-        Mail::to($request->email)->send(new Contact($message,$name,$mailfrom));
+        Mail::to($request->email)->send(new Contact($message, $name, $mailfrom));
 
-        Toastr::success('message', 'Mail send successfully.');
+        Toastr::success('message', 'Mail sent successfully.');
         return back();
     }
-
 }

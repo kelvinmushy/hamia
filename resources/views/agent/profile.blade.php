@@ -141,18 +141,13 @@
                             @csrf
 
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="name">Name</label>
                                         <input id="name" name="name" type="text" value="{{ $profile->name }}" class="form-control" required>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="username">Username</label>
-                                        <input id="username" name="username" type="text" value="{{@$profile->username}}" class="form-control" required>
-                                    </div>
-                                </div>
+                               
                             </div>
                             
                             <div class="row">
@@ -198,7 +193,7 @@
                                         <select class="form-control select_region" name="region_id" required id="region_id" style="width:100%">
                                             <option value="">Select Region</option>
                                             @foreach($region as $region)
-                                                <option value="{{$region->id}}" {{ $profile->user_location && $profile->user_location->district->region_id == $region->id ? 'selected' : '' }}>
+                                                <option value="{{$region->id}}" {{ $profile->location && $profile->location->district->region_id == $region->id ? 'selected' : '' }}>
                                                     {{$region->name}}
                                                 </option>
                                             @endforeach
@@ -211,7 +206,7 @@
                                         <select class="form-control select_district" name="district_id" id="district_id" required style="width:100%">
                                             <option value="">Select District</option>
                                             @foreach($district as $district)
-                                                <option value="{{$district->id}}" {{ $profile->user_location && $profile->user_location->district_id == $district->id ? 'selected' : '' }}>
+                                                <option value="{{$district->id}}" {{ $profile->location && $profile->location->district_id == $district->id ? 'selected' : '' }}>
                                                     {{$district->name}}
                                                 </option>
                                             @endforeach
@@ -222,7 +217,7 @@
                                     <div class="form-group">
                                         <label for="sub_location">Sub Location</label>
                                         <input type="text" name="sub_location" id="sub_location" class="form-control" 
-                                               value="{{ $profile->user_location ? $profile->user_location->sub_location : '' }}" required>
+                                               value="{{ $profile->location ? $profile->location->sub_location : '' }}" required>
                                     </div>
                                 </div>
                             </div>
