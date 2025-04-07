@@ -1,11 +1,11 @@
 <?php
 
 use App\Http\Controllers\Companies\CompanyController;
+use App\Http\Controllers\Companies\Customer\CustomerController;
 use App\Http\Controllers\Companies\ManageUnit\UnitController;
 use App\Http\Controllers\Companies\Project\ProjectController;
 use App\Http\Controllers\Companies\Project\ProjectDivisionController;
 use App\Http\Controllers\Companies\Project\ProjectRepaymentController;
-
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -202,6 +202,14 @@ Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified', 'hasComp
     Route::get('/company/{company}', [CompanyController::class, 'show'])->name('company.show'); // Optional: Show company details
 
     Route::get('/properties/{id}/edit', 'App\Http\Controllers\Agent\PropertyController@update');
+
+    //Customer
+    Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
+    Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
+
+    // Route to update an existing customer
+     Route::put('/customers/update/{id}', [CustomerController::class, 'update'])->name('customers.update');
+
 
     //Projects Controller will be Here
     Route::resource('projects', ProjectController::class);

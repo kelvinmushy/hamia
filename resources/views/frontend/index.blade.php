@@ -11,22 +11,58 @@
     @livewireStyles
     <link rel="stylesheet" href="{{ asset('css/property_card.css') }}">
     <style>
-          .property-image {
-        position: relative; /* Make this relative to position the overlay */
-        height: 200px; /* Set a fixed height for the image container */
-        background-size: cover; /* Cover the entire area */
-        background-position: center; /* Center the image */
-    }
+        .property-image {
+            position: relative;
+            /* Make this relative to position the overlay */
+            height: 200px;
+            /* Set a fixed height for the image container */
+            background-size: cover;
+            /* Cover the entire area */
+            background-position: center;
+            /* Center the image */
+        }
 
-    .property-count {
-        position: absolute; /* Position the count */
-        bottom: 10px; /* 10px from the bottom */
-        right: 10px; /* 10px from the right */
-        background: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
-        color: white; /* White text color */
-        padding: 5px 10px; /* Padding for better spacing */
-        border-radius: 5px; /* Rounded corners */
-    }
+        .property-count {
+            position: absolute;
+            /* Position the count */
+            bottom: 10px;
+            /* 10px from the bottom */
+            right: 10px;
+            /* 10px from the right */
+            background: rgba(0, 0, 0, 0.6);
+            /* Semi-transparent background */
+            color: white;
+            /* White text color */
+            padding: 5px 10px;
+            /* Padding for better spacing */
+            border-radius: 5px;
+            /* Rounded corners */
+        }
+
+        .whatsapp-icon {
+            z-index: 1000;
+            /* Ensure the icon is above other content */
+        }
+
+        .whatsapp-icon .btn {
+            width: 56px;
+            /* Set width for the button */
+            height: 56px;
+            /* Set height for the button */
+            display: flex;
+            /* Center icon */
+            justify-content: center;
+            /* Center icon */
+            align-items: center;
+            /* Center icon */
+        }
+
+        .whatsapp-icon i {
+            font-size: 24px;
+            /* Icon size */
+            color: #fff;
+            /* White color for the icon */
+        }
     </style>
 @endsection
 
@@ -38,7 +74,8 @@
 
     <!-- WhatsApp Chat Icon -->
     <div class="whatsapp-icon position-fixed bottom-0 end-0 p-3">
-        <a href="https://wa.me/+255659703509?text=Hello%20I%20would%20like%20to%20inquire%20about%20your%20properties!" target="_blank" class="btn btn-success rounded-circle">
+        <a href="https://wa.me/+255659703509?text=Hello%20I%20would%20like%20to%20inquire%20about%20your%20properties!"
+            target="_blank" class="btn btn-success rounded-circle">
             <i class="fa fa-whatsapp"></i> <!-- Font Awesome WhatsApp icon -->
         </a>
     </div>
@@ -47,26 +84,26 @@
 @section('bot')
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script type="text/javascript">
-        window.onscroll = function(ev) {
+        window.onscroll = function (ev) {
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
                 window.livewire.emit('load-more');
             }
         };
 
-        $(document).ready(function(){
-            $('#sub_cat_type_id').on('change', function(e) { 
+        $(document).ready(function () {
+            $('#sub_cat_type_id').on('change', function (e) {
                 livewire.emit('listenerSubCategoryType', $('#sub_cat_type_id').select2("val"));
             });
 
-            $('#selectPurpose').on('change', function(e) { 
+            $('#selectPurpose').on('change', function (e) {
                 livewire.emit('listenerPurpose', $('#selectPurpose').select2("val"));
             });
 
-            $('#city_id').on('change', function(e) { 
+            $('#city_id').on('change', function (e) {
                 livewire.emit('listenerCity', $('#city_id').select2("val"));
             });
 
-            $('#district_id').on('change', function(e) { 
+            $('#district_id').on('change', function (e) {
                 livewire.emit('listenerDistrict', $('#district_id').select2("val"));
             });
 
@@ -81,7 +118,7 @@
                     type: "POST",
                     url: '/regionApi',
                     dataType: 'json',
-                    data: function(params) {
+                    data: function (params) {
                         return {
                             term: params.term || '',
                             page: params.page || 1,
@@ -102,7 +139,7 @@
                     type: "POST",
                     url: '/purposeApi',
                     dataType: 'json',
-                    data: function(params) {
+                    data: function (params) {
                         return {
                             term: params.term || '',
                             page: params.page || 1,
@@ -123,7 +160,7 @@
                     type: "POST",
                     url: '/propertyCategoryTypeApi',
                     dataType: 'json',
-                    data: function(params) {
+                    data: function (params) {
                         return {
                             term: params.term || '',
                             page: params.page || 1,
@@ -144,7 +181,7 @@
                     type: "POST",
                     url: '/districtApi',
                     dataType: 'json',
-                    data: function(params) {
+                    data: function (params) {
                         return {
                             term: params.term || '',
                             page: params.page || 1,
@@ -154,24 +191,7 @@
                 }
             });
         });
+
+
     </script>
 @endsection
-
-<style>
-    .whatsapp-icon {
-        z-index: 1000; /* Ensure the icon is above other content */
-    }
-
-    .whatsapp-icon .btn {
-        width: 56px; /* Set width for the button */
-        height: 56px; /* Set height for the button */
-        display: flex; /* Center icon */
-        justify-content: center; /* Center icon */
-        align-items: center; /* Center icon */
-    }
-
-    .whatsapp-icon i {
-        font-size: 24px; /* Icon size */
-        color: #fff; /* White color for the icon */
-    }
-</style>

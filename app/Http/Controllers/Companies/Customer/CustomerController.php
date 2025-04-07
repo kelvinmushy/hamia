@@ -1,22 +1,23 @@
 <?php
-namespace App\Http\Controllers\Customer;
+
+namespace App\Http\Controllers\Companies\Customer;
 
 use App\Models\Customer;
-use App\Models\Project;
-
-use App\Models\CustomerRepayment;
-
+use App\Models\Region;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Auth;
 
 class CustomerController extends Controller
 {
     public function index()
     {
-        // Get all projects for customer to choose from
-        $projects = Project::all();
-        return view('company.customer.register', compact('projects'));
+        // Get all customers and regions
+        $customers = Customer::with('district')->get();
+        $regions = Region::all();
+
+        return view('company.customer.index', compact('customers', 'regions'));
     }
 
     public function store(Request $request)
@@ -24,55 +25,48 @@ class CustomerController extends Controller
         DB::beginTransaction();
 
         try {
-            // Validate customer information and payment
+            // Validate customer input
             $validated = $request->validate([
                 'name' => 'required|string',
-                'email' => 'required|email|unique:customers,email',
-                'phone' => 'required|string',
+                'email' => 'nullable|email|unique:customers,email',
+                'phone_number' => 'required|string',
                 'address' => 'required|string',
-                'project_id' => 'required|exists:projects,id',
-                'payment_method' => 'required|string', // Cash or Installment
-                'amount_paid' => 'required|numeric',
-                'installment_period' => 'nullable|numeric',
-                'installment_amount' => 'nullable|numeric',
+                'district_id' => 'required|exists:districts,id',
             ]);
 
             // Create customer
-            $customer = Customer::create([
+            Customer::create([
                 'name' => $validated['name'],
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
+                'company_id' => Auth::user()->company->id,
+                'email' => $validated['email'] ?? null,
+                'phone_number' => $validated['phone_number'],
+                'district_id' => $validated['district_id'],
                 'address' => $validated['address'],
             ]);
 
-            // Get the selected project
-            $project = Project::find($validated['project_id']);
-            
-            // Check if payment is installment and store accordingly
-            $repayment = ProjectRepayment::create([
-                'project_id' => $validated['project_id'],
-                'customer_id' => $customer->id,
-                'payment_method' => $validated['payment_method'],
-                'amount_paid' => $validated['amount_paid'],
-                'remaining_balance' => $project->price - $validated['amount_paid'],
-            ]);
-
-            // If it's installment, save the installment info
-            if ($validated['payment_method'] == 'installment') {
-                $repayment->installment_period = $validated['installment_period'];
-                $repayment->installment_amount = $validated['installment_amount'];
-                $repayment->save();
-            }
-
-            // Commit the transaction
             DB::commit();
 
-            return response()->json(['message' => 'Mteja amesajiliwa kwa mafanikio!'], 200);
-
+            return redirect()->back()->with('success', 'Customer added successfully');
         } catch (\Exception $e) {
-            // Rollback the transaction if anything goes wrong
             DB::rollBack();
-            return response()->json(['error' => 'Kusajili mteja kumeshindikana, tafadhali jaribu tena.'], 500);
+            return redirect()->back()->with('error', 'Something went wrong: ' . $e->getMessage());
         }
     }
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|min:2',
+            'phone_number' => 'required|string|regex:/^255[0-9]{9}$/|size:12',
+            'email' => 'nullable|email',
+            'district_id' => 'required|exists:districts,id',
+            'address' => 'required|string',
+        ]);
+
+        $customer = Customer::findOrFail($id);
+        $customer->update($validated);
+
+        return response()->json(['message' => 'Customer updated successfully.']);
+    }
+
 }
