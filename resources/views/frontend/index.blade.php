@@ -10,6 +10,24 @@
     <link rel="stylesheet" href="{{ asset('backend/plugins/bootstrap-select/css/bootstrap-select.css') }}">
     @livewireStyles
     <link rel="stylesheet" href="{{ asset('css/property_card.css') }}">
+    <style>
+          .property-image {
+        position: relative; /* Make this relative to position the overlay */
+        height: 200px; /* Set a fixed height for the image container */
+        background-size: cover; /* Cover the entire area */
+        background-position: center; /* Center the image */
+    }
+
+    .property-count {
+        position: absolute; /* Position the count */
+        bottom: 10px; /* 10px from the bottom */
+        right: 10px; /* 10px from the right */
+        background: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+        color: white; /* White text color */
+        padding: 5px 10px; /* Padding for better spacing */
+        border-radius: 5px; /* Rounded corners */
+    }
+    </style>
 @endsection
 
 @section('content')

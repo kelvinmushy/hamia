@@ -33,10 +33,11 @@
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        <h5 class="card-title">{{ Str::limit(ucwords(@$property->title), 15) }}</h5>
-                                        <p class="card-text">
-                                            <strong>{{ Str::title($property->currency->name) }} {{ number_format($property->price, 0) }}</strong> per {{ @$property->property_term->term->name }}
-                                        </p>
+                                        <h5 class="card-title fs-6 text-black text-decoration-none">{{ Str::limit(ucwords(@$property->title), 15) }}</h5>
+<p class="card-text fs-7 text-black text-decoration-none">
+    <strong>{{ Str::title($property->currency->name) }} {{ number_format($property->price, 0) }}</strong> per {{ @$property->property_term->term->name }}
+</p>
+
                                     </div>
                                 </a>
                             </div>
