@@ -26,13 +26,13 @@
                     <form id="editCompanyForm" enctype="multipart/form-data">
                         @csrf
                         @method('POST')
-
+                    
                         <!-- Company Name -->
                         <div class="form-group">
                             <label for="company_name">Company Name</label>
                             <input id="company_name" name="name" type="text" class="form-control" value="{{ $company->name }}" required>
                         </div>
-
+                    
                         <!-- Region Dropdown -->
                         <div class="form-group">
                             <label for="region_id">Region</label>
@@ -45,7 +45,7 @@
                                 @endforeach
                             </select>
                         </div>
-
+                    
                         <!-- District Dropdown -->
                         <div class="form-group">
                             <label for="district_id">District</label>
@@ -58,35 +58,42 @@
                                 @endforeach
                             </select>
                         </div>
-
+                    
                         <!-- Address -->
                         <div class="form-group">
                             <label for="address">Address</label>
                             <input id="address" name="sub_location" type="text" class="form-control" value="{{ $company->location->sub_location }}" required>
                         </div>
-
+                    
                         <!-- Phone Number -->
                         <div class="form-group">
                             <label for="phone_number">Phone Number</label>
                             <input id="phone_number" name="phone_number" type="text" class="form-control" value="{{ $company->phone_number }}" required>
                         </div>
-
+                    
                         <!-- Email -->
                         <div class="form-group">
                             <label for="email">Email</label>
                             <input id="email" name="email" type="email" class="form-control" value="{{ $company->email }}" required>
                         </div>
-
+                    
+                        <!-- About Textarea -->
+                        <div class="form-group">
+                            <label for="about">About Company</label>
+                            <textarea id="about" name="about" class="form-control" rows="5" placeholder="Write something about the company...">{{ $company->about }}</textarea>
+                        </div>
+                    
                         <!-- Logo Upload -->
                         <div class="form-group">
                             <label for="logo">Company Logo</label>
-                            <input type="file" name="logo" class="form-control-file">
+                            <input type="file" name="image" class="form-control-file">
                         </div>
-
+                    
                         <button class="btn btn-primary w-100" type="submit">
                             <i class="fa fa-save"></i> Update Company
                         </button>
                     </form>
+                    
                 </div>
             </div>
         </div>
@@ -149,7 +156,7 @@ $(document).ready(function(){
         let formData = new FormData(this);
 
         $.ajax({
-            url: "{{ route('agent.company.update', $company->id) }}",
+            url: "/agent/profile",
             type: "POST",
             data: formData,
             processData: false,

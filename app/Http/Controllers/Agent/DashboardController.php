@@ -10,6 +10,7 @@ use Intervention\Image\Facades\Image;
 use App\Mail\Contact;
 use Carbon\Carbon;
 use App\Models\Property;
+use App\Models\Company;
 use App\Models\CompanyLocation;
 use App\Models\Region;
 use App\Models\Message;
@@ -19,6 +20,7 @@ use App\Models\User;
 use App\Models\District;
 use Auth;
 use Hash;
+use DB;
 use Toastr;
 
 class DashboardController extends Controller
@@ -32,7 +34,7 @@ class DashboardController extends Controller
 
         // Check if the company has a complete profile
         $check_company = Company::where('id', $company_id)->first();
-        if ($check_company->image == "" || $check_company->phone_number == "" || $check_company->about == "" || $check_company->company_location == "") {
+        if ($check_company->logo == "" || $check_company->phone_number == "" || $check_company->about == "" || $check_company->location->sub_location== "") {
             $profile = Auth::user();
             $region = Region::orderBy('name')->get();
             $district = District::orderBy('name')->get();
@@ -97,6 +99,7 @@ class DashboardController extends Controller
 
     public function profileUpdate(Request $request)
     {
+        // Validate incoming request data
         $request->validate([
             'name' => 'required',
             'phone_number' => 'required',
@@ -105,43 +108,69 @@ class DashboardController extends Controller
             'about' => 'max:250'
         ]);
     
-        // Get the company associated with the authenticated user
-        $company = Auth::user()->company;
+        // Begin a database transaction
+        DB::beginTransaction();
     
-        // Check if a file has been uploaded
-        $image = $request->file('image');
-        if (request()->hasFile('image')) {
-            $path = 'images/company/';
-            $filename = uniqid(date('Hmdysi')) . '_' . $image->getClientOriginalName();
-            $upload = $request->file('image')->move($path, $filename);
-            if ($upload) {
-                $image = $path . $filename;
+        try {
+            // Get the company associated with the authenticated user
+            $company = Auth::user()->company;
+    
+            // Handle image upload
+            $image = $company->logo; // Get the current logo path
+            if ($request->hasFile('image')) {
+                // Check if the existing image file exists and delete it
+                if ($image && file_exists(public_path($image))) {
+                    unlink(public_path($image)); // Unlink the existing image
+                }
+    
+                // Process the new image upload
+                $path = 'images/company/';
+                $filename = uniqid(date('Hmdysi')) . '_' . $request->file('image')->getClientOriginalName();
+                $upload = $request->file('image')->move($path, $filename);
+                if ($upload) {
+                    $image = $path . $filename; // Set the new image path
+                }
             }
-        } else {
-            // If no image uploaded, retain the current image
-            $image = $company->logo;
+    
+            // Update the company's basic info (name, email, phone, etc.)
+            $company->name = $request->name;
+            $company->email = $request->email;
+            $company->logo = $image; // Save the new image path as the company logo
+            $company->phone_number = $request->phone_number;
+            $company->about = $request->about; // Assuming you have a column for "about" in the Company model
+    
+            $company->save();
+    
+            // Save location details under company_id in the CompanyLocation model
+            $company_location = $company->location ?? new CompanyLocation(); // Fetch existing location or create a new one
+    
+            $company_location->district_id = $request->district_id;
+            $company_location->sub_location = $request->sub_location;
+            $company_location->updator_id = Auth::user()->id; // Save the updater ID (user ID)
+            $company_location->company_id = $company->id; // Link the location to the company
+            $company_location->save();
+    
+            // Commit the transaction
+            DB::commit();
+    
+            // Return a success response in JSON format
+            return response()->json([
+                'success' => true,
+                'message' => 'Company profile updated successfully.'
+            ]);
+        } catch (\Exception $e) {
+            // Rollback the transaction if something went wrong
+            DB::rollBack();
+    
+            // Return a JSON response with an error message
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update company profile. Please try again later.',
+                'error' => $e->getMessage() // Optional: Return the error message
+            ]);
         }
-    
-        // Update the company's basic info (name, email, phone, etc.)
-        $company->name = $request->name;
-        $company->email = $request->email;
-        $company->logo = $image; // Here we save the image as the company logo
-        $company->phone_number = $request->phone_number;
-        $company->about = $request->about; // Assuming you have a column for "about" in the Company model
-    
-        $company->save();
-    
-        // Now save the location details under company_id in the CompanyLocation model
-        $company_location = $company->location ?? new CompanyLocation(); // Fetch existing location or create a new one
-    
-        $company_location->district_id = $request->district_id;
-        $company_location->sub_location = $request->sub_location;
-        $company_location->updator_id = Auth::user()->id; // Save the updater ID (user ID)
-        $company_location->company_id = $company->id; // Link the location to the company
-        $company_location->save();
-    
-        return back()->with('success', 'Company profile updated successfully.');
     }
+    
     
     public function changePassword()
     {

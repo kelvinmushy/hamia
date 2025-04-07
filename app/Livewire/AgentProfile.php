@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\User;
+use App\Models\Company;
 
 class AgentProfile extends Component
 {
@@ -12,8 +12,8 @@ class AgentProfile extends Component
     {
 
         
-        $agent=User::where('id',$this->agent_id)->first();
-        return view('livewire.agent-profile',compact('agent'));
+        $company=Company::where('id',$this->agent_id)->first();
+        return view('livewire.agent-profile',compact('company'));
     }
 
 }

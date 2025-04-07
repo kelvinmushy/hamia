@@ -32,5 +32,9 @@ class Company extends Model
         return  $this->hasMany('App\Models\CompanySocialMedia');
     }
 
+     public function property(){
+        return  $this->hasMany('App\Models\Property');
+    } 
+     
 
 }

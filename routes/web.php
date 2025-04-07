@@ -93,7 +93,7 @@ Route::post('/property/rating', [App\Http\Controllers\PagesController::class, 'p
 Route::get('/property/city/{cityslug}', [App\Http\Controllers\PagesController::class, 'propertyCities'])->name('property.city');
 
 Route::get('/all-real-estate-agents-in-tanzania', [App\Http\Controllers\PagesController::class, 'agents'])->name('agents');
-Route::get('/real-estate-agent/{username}/{id}', [App\Http\Controllers\PagesController::class, 'agentshow'])->name('agents.show');
+Route::get('/real-estate-agent/{name}/{id}', [App\Http\Controllers\PagesController::class, 'agentshow'])->name('agents.show');
 
 Route::get('/gallery', [App\Http\Controllers\PagesController::class, 'gallery'])->name('gallery');
 //Location will be here

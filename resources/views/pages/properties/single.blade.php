@@ -381,7 +381,7 @@
                                 @endif
                                 
                                 <p class="text-muted" style="text-align: center;">
-                                    <i class="zmdi zmdi-pin-drop"> {{@$property->company->company_location->sub_location}},{{@$property->company->company_location->district->name}},{{@$property->company->company_location->district->region->name}}</i>
+                                    <i class="zmdi zmdi-pin-drop"> {{@$property->company->location->sub_location}},{{@$property->company->location->district->name}},{{@$property->company->location->district->region->name}}</i>
                                 </p>
                             </div>
                             <hr>

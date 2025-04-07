@@ -150,11 +150,8 @@
         }
     }
 </style>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="{{asset('backend/plugins/bootstrap-select/css/bootstrap-select.css')}}">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.4.5/css/fileinput.min.css" media="all" rel="stylesheet" type="text/css" />
-<!-- Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
 @endsection
 
 @section('content')
@@ -198,16 +195,16 @@
                                                 </a>
                                             @else
                                                 <a href="{{ route('agent.message.read', $message->id) }}" class="btn-action btn-view" title="Mark as unread">
-                                                    <i class="fas fa-envelope-open-text"></i>
+                                                    <i class="fa fa-envelope"></i>
                                                 </a>
                                             @endif
                                             
                                             <a href="{{ route('agent.message.replay', $message->id) }}" class="btn-action btn-reply" title="Reply">
-                                                <i class="fas fa-reply"></i>
+                                                <i class="fa fa-reply"></i>
                                             </a>
                                             
                                             <button type="button" class="btn-action btn-delete" onclick="deleteMessage({{ $message->id }})" title="Delete">
-                                                <i class="fas fa-trash-alt"></i>
+                                                <i class="fa fa-trash"></i>
                                             </button>
                                             
                                             <form action="{{ route('agent.messages.destroy', $message->id) }}" method="POST" id="del-message-{{ $message->id }}" style="display:none;">
@@ -233,8 +230,7 @@
 @endsection
 
 @section('bot')
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.js"></script>
+
 
 <script>
     // Delete message confirmation

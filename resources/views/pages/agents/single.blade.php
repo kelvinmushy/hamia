@@ -3,6 +3,35 @@
 @section('top')
     <link rel="stylesheet" href="{{asset('backend/plugins/bootstrap-select/css/bootstrap-select.css')}}">
   <link rel="stylesheet" href="{{asset('css/property_card.css')}}">
+  <style>
+    .property-card {
+        transition: transform 0.2s, box-shadow 0.2s; /* Smooth transition for hover effect */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Initial shadow */
+    }
+
+    .property-card:hover {
+        transform: translateY(-5px); /* Lift effect on hover */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Increased shadow on hover */
+    }
+
+    .property-image {
+        background-size: cover; /* Cover the entire area */
+        background-position: center; /* Center the image */
+        height: 200px; /* Fixed height for image */
+        position: relative; /* For absolute positioning of the count */
+    }
+
+    .property-count {
+        position: absolute; /* Position the count at the bottom */
+        bottom: 10px; /* 10px from the bottom */
+        right: 10px; /* 10px from the right */
+        background: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+        color: white; /* White text color */
+        padding: 5px 10px; /* Padding for better spacing */
+        border-radius: 5px; /* Rounded corners */
+    }
+    
+</style>
     @livewireStyles
 @endsection
 @section('content')

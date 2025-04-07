@@ -8,12 +8,13 @@
   margin-right: auto;
   width: 50%;
 }
-.sidebar-item a{
-    color:#000;
-}
-.sidebar-item a:hover {
-  color:#22bb33;
-}
+
+    .sidebar-item .nav-link:hover {
+        background-color: #f8f9fa;
+        box-shadow: none !important;
+    }
+
+
 </style>
 @endsection
 @section('content')

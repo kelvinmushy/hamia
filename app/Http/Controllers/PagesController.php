@@ -6,8 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\Contact;
-
+use App\Models\Company;
 use App\Models\Property;
+
 use App\Models\Message;
 use App\Models\Gallery;
 use App\Models\Comment;
@@ -59,17 +60,18 @@ class PagesController extends Controller
     // AGENT PAGE
     public function agents()
     {
-        $agents = User::latest()->where('role_id', 2)->paginate(12);
+        
+        $company = Company::latest()->paginate(12);
 
-        return view('pages.agents.index', compact('agents'));
+        return view('pages.agents.index', compact('company'));
     }
 
-    public function agentshow($username,$id)
+    public function agentshow($name,$id)
     {
-        $agent      = User::findOrFail($id);
-        $properties = Property::latest()->where('agent_id', $id)->paginate(10);
-
-        return view('pages.agents.single', compact('agent','properties','id'));
+       
+         $company=Company::where('id',$id)->get();
+   
+        return view('pages.agents.single', compact('company','id'));
     }
 
 
