@@ -7,6 +7,7 @@ use App\Models\District;
 use App\Models\Region;
 use Illuminate\Http\Request;
 use App\Models\Project;
+use App\Models\Customer;
 use App\Models\ProjectDivision;
 use App\Models\ProjectLocation;
 use App\Models\ProjectPayment;
@@ -35,7 +36,7 @@ class ProjectDivisionController extends Controller
         $region = Region::orderBy('name')->get();
         $district = District::orderBy('name')->get();
         $project = Project::where('id', $project_id)->first();
-
+        $clients=Customer::get();
 
         // Get all project divisions for the given project_id
         $project_division = ProjectDivision::where('project_id', $project_id)->where('division_type',$type)->get();
@@ -72,7 +73,7 @@ class ProjectDivisionController extends Controller
 
 
         // Pass the data to the view
-        return view('company.projects.division.index', compact('project_division', 'company', 'region', 'district', 'project_id', 'type', 'totalDivisions', 'totalPrice', 'remainingSize', 'project'));
+        return view('company.projects.division.index', compact('project_division', 'company', 'clients','region', 'district', 'project_id', 'type', 'totalDivisions', 'totalPrice', 'remainingSize', 'project'));
     }
 
 

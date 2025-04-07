@@ -6,14 +6,16 @@ use Illuminate\Http\Request;
 use App\Models\Unit;
 use App\Models\Property; // if you associate units with a property
 use Illuminate\Support\Facades\Auth;
+use App\Models\Customer; 
 use App\Http\Controllers\Controller;
 class UnitController extends Controller
 {
     public function index()
     {
         $properties=Property::get();
+        $clients=Customer::get();
         $units = Unit::with('property')->where('creator_id', Auth::id())->get();
-        return view('company.projects.property_unity.index', compact('units','properties'));
+        return view('company.projects.property_unity.index', compact('units','properties','clients'));
     }
 
     public function create()

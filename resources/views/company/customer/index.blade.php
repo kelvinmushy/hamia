@@ -20,44 +20,45 @@
                             <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#customerModal">
                                 Add Customer
                             </button>
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Phone</th>
-                                        <th>Email</th>
-                                        <th>District</th>
-                                        <th>Address</th>
-                                        <th>Actions</th> <!-- Added Actions column -->
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($customers as $customer)
+                            <div class="table-responsive"> <!-- Added table-responsive class -->
+                                <table class="table table-bordered table-hover"> <!-- Added table-bordered and table-hover classes -->
+                                    <thead>
                                         <tr>
-                                            <td>{{ $customer->name }}</td>
-                                            <td>{{ $customer->phone_number }}</td>
-                                            <td>{{ $customer->email }}</td>
-                                            <td>{{ $customer->district->name ?? 'N/A' }}</td>
-                                            <td>{{ $customer->address }}</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-primary editButton"
-                                                    data-id="{{ $customer->id }}" data-name="{{ $customer->name }}"
-                                                    data-phone="{{ $customer->phone_number }}"
-                                                    data-email="{{ $customer->email }}"
-                                                    data-district="{{ $customer->district_id }}"
-                                                    data-address="{{ $customer->address }}" data-bs-toggle="modal"
-                                                   >
-                                                    <i class="fa fa-edit"></i>
-                                                </button>
-                                            </td>
+                                            <th>Name</th>
+                                            <th>Phone</th>
+                                            <th>Email</th>
+                                            <th>District</th>
+                                            <th>Address</th>
+                                            <th>Actions</th> <!-- Added Actions column -->
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-
-
+                                    </thead>
+                                    <tbody>
+                                        @foreach($customers as $customer)
+                                            <tr>
+                                                <td>{{ $customer->name }}</td>
+                                                <td>{{ $customer->phone_number }}</td>
+                                                <td>{{ $customer->email }}</td>
+                                                <td>{{ $customer->district->name ?? 'N/A' }}</td>
+                                                <td>{{ $customer->address }}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary editButton"
+                                                        data-id="{{ $customer->id }}" data-name="{{ $customer->name }}"
+                                                        data-phone="{{ $customer->phone_number }}"
+                                                        data-email="{{ $customer->email }}"
+                                                        data-district="{{ $customer->district_id }}"
+                                                        data-address="{{ $customer->address }}" 
+                                                        data-bs-toggle="modal" data-bs-target="#customerModal">
+                                                        <i class="fa fa-edit"></i> Edit
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
+                    
                 </div>
             </div>
         </div>

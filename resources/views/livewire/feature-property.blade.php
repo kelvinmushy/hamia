@@ -1,5 +1,4 @@
 <div class="row">
-   
     <!-- Sidebar Section -->
     <div class="col-md-3">
         @include('frontend.partials.sidebar')
@@ -15,16 +14,13 @@
         <!-- Property Listings Title -->
         <h4 class="mb-2"><b>🏡 Properties in Tanzania</b></h4>
 
-        <div class="row" style="margin-top: 0;">
+        <div class="row" style="margin-top: 0;"> <!-- Directly setting margin-top to 0 -->
             <!-- Loop through Properties -->
             @foreach($properties as $property)
-                <div class="col-lg-3 col-md-4 col-sm-6 px-1 py-1">
+                <div class="col-lg-3 col-md-4 col-sm-6 px-1 py-1" style="margin-top: 0;"> <!-- Reduced margin-top for individual cards -->
                     <div class="card shadow-sm border-0 rounded-4 overflow-hidden property-card position-relative">
                         <?php $x = $property->image; ?>
-                        <a href="#" class="text-decoration-none" 
-                           wire:click.prevent="showPropertyModal('{{ $property->id }}')" 
-                           data-bs-toggle="modal" 
-                           data-bs-target="#propertyModal">
+                        <a href="/property/{{ str_slug($property->property_location->name) }}/{{$property->sub_category->slug}}/{{ str_slug($property->title) }}/{{$property->id }}" class="text-decoration-none">
                             
                             <!-- Property Image -->
                             <div class="property-image" style="background-image: url('{{ asset($x) }}'); height: 200px; background-size: cover; background-position: center;">
@@ -34,7 +30,7 @@
                                 </div>
 
                                 <!-- Premium Badge -->
-                                @if($property->featured == 1)
+                                @if($property->featured==1) <!-- Assuming 'is_premium' is a boolean attribute -->
                                     <span class="badge bg-warning text-dark position-absolute" style="top: 10px; left: 10px;">
                                         Premium
                                     </span>
@@ -70,10 +66,4 @@
             </div>
         @endif
     </div>
-    <!-- Modal for Property Preview -->
-
-
 </div>
-
-
-

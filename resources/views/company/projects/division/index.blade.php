@@ -92,6 +92,7 @@
                                             <th>Aina ya Sehemu</th>
                                             <th>Ukubwa (m²)</th>
                                             <th>Bei ya Uuzaji</th>
+                                            <th>Status</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -103,25 +104,65 @@
                                                 <td>{{ ucfirst($division->division_type) }}</td>
                                                 <td>{{ $division->size }}</td>
                                                 <td>{{ number_format($division->sell_price, 2) }}</td>
-                                                <td>
+                                                
+                                                <td style="color: 
+                                                @if($division->payment_status == 'ongoing')
+                                                    #f39c12; /* Yellow for ongoing */
+                                                @elseif($division->payment_status == 'completed')
+                                                    #2ecc71; /* Green for completed */
+                                                @else
+                                                    #e74c3c; /* Red for not sold */
+                                                @endif
+                                            ">
+                                                @if($division->payment_status == 'ongoing')
+                                                    Ongoing
+                                                @elseif($division->payment_status == 'completed')
+                                                    Completed
+                                                @else
+                                                    Not Sold
+                                                @endif
+                                            </td>
+                                            
+                                                
+                                            <td>
+                                                @if($division->payment_status != 'completed' && $division->payment_status != 'ongoing')
                                                     <!-- Edit Button -->
-                                                    <button class="btn btn-sm btn-primary edit-project" data-id="{{ $division->id }}"
-                                                        data-name="{{ $division->name }}" data-type="{{ $division->division_type }}"
-                                                        data-size="{{ $division->size }}" data-sell_price="{{ $division->sell_price }}"
-                                                        data-bs-toggle="modal" data-bs-target="#projectDivision">
+                                                    <button class="btn btn-sm btn-primary edit-project" 
+                                                            data-id="{{ $division->id }}"
+                                                            data-name="{{ $division->name }}" 
+                                                            data-type="{{ $division->division_type }}"
+                                                            data-size="{{ $division->size }}" 
+                                                            data-sell_price="{{ $division->sell_price }}" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#projectDivision">
                                                         <i class="fa fa-edit"></i>
                                                     </button>
-                                
+                                                    
+                                                    <!-- Uza Button -->
+                                                    <button class="btn btn-sm btn-primary uza-project" 
+                                                            data-id="{{ $division->id }}" 
+                                                            data-sell_price="{{ $division->sell_price }}">
+                                                        <i class="fa fa-edit"></i> 
+                                                    </button>
+                                            
                                                     <!-- Delete Button -->
-                                                    <form action="{{ route('agent.project.division.destroy', $division->id) }}" method="POST"
-                                                        class="d-inline">
+                                                    <form action="{{ route('agent.project.division.destroy', $division->id) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button class="btn btn-sm btn-danger" onclick="return confirm('Una uhakika?')">
-                                                            <i class="fa fa-trash"></i>
+                                                            <i class="fa fa-trash"></i> 
                                                         </button>
                                                     </form>
-                                                </td>
+                                                @else
+                                                    <!-- If ongoing or completed, show only View Details link -->
+                                                    {{-- {{ route('agent.project.division.details', $division->id) }} --}}
+                                                    <a href="" class="btn btn-sm btn-info">
+                                                        <i class="fa fa-eye"></i> 
+                                                    </a>
+                                                @endif
+                                            </td>
+                                            
+                                                
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -138,6 +179,9 @@
     </div>
 
     <div>@include('company.projects.division.form')</div>
+    
+    <div>@include('company.projects.division.cust_payment_form')</div>
+    
     {{-- <div>@include('company.projects.project_repayment')</div> --}}
 
 
@@ -146,8 +190,7 @@
 @endsection
 
 @section('bot')
-    <script>
-
+<script>
 $(document).ready(function () {
 
 // Open the modal to add a new project division
@@ -229,8 +272,60 @@ $('.edit-project').on('click', function () {
     $('#sell_price').val($(this).data('sell_price'));
 });
 
+$('.uza-project').on('click', function () {
+        var divisionId = $(this).data('id');
+        var sellPrice = $(this).data('sell_price');  // Get the sell price of the division
+        
+        // Populate the modal with the division ID and sell price
+        $('#division_id').val(divisionId);
+        $('#sell_price1').val(sellPrice);  // Set the sell price in the modal (readonly field)
+
+        // Optional: Update the field label if needed to show the amount
+        $('#payment_amount_label').text("Kiasi cha Malipo: " + sellPrice);
+
+        // Show the modal
+        $('#uzaModal').modal('show');  // Trigger the modal to show
+    });
+
+// Handle payment type change (Cash or Installment)
+$('#payment_type').on('change', function () {
+    var paymentType = $(this).val();  // Get selected payment type
+
+    if (paymentType == 'installments') {
+        // Show installment-related fields
+        $('#installment_fields').show();
+    } else {
+        // Hide installment-related fields
+        $('#installment_fields').hide();
+    }
 });
 
-    </script>
+// Handle form submission for payment
+$('#uzaForm').on('submit', function (event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    var formData = new FormData(this); // Collect form data
+
+    $.ajax({
+        url: $(this).attr('action'),
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            toastr.success(response.message);
+            $('#uzaModal').modal('hide'); // Close the modal on success
+            location.reload(); // Reload the page to reflect the changes
+        },
+        error: function (xhr) {
+            toastr.error('Something went wrong. Please try again.');
+        }
+    });
+});
+
+});
+
+</script>
+    
 
 @endsection

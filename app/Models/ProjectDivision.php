@@ -15,7 +15,7 @@
        * @var array
        */
       protected $fillable = [
-          'name', 'project_id', 'land_type', 'size', 'sell_price', 'creator_id', 'updator_id','division_type'
+          'name', 'project_id', 'land_type', 'size', 'sell_price', 'creator_id', 'updator_id','division_type','payment_type','payment_frequency','installment_count'
       ];
   
       /**

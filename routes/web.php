@@ -3,6 +3,7 @@
 use App\Http\Controllers\Companies\CompanyController;
 use App\Http\Controllers\Companies\Customer\CustomerController;
 use App\Http\Controllers\Companies\ManageUnit\UnitController;
+use App\Http\Controllers\Companies\Project\CustomerPaymentController;
 use App\Http\Controllers\Companies\Project\ProjectController;
 use App\Http\Controllers\Companies\Project\ProjectDivisionController;
 use App\Http\Controllers\Companies\Project\ProjectRepaymentController;
@@ -208,7 +209,7 @@ Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified', 'hasComp
     Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
 
     // Route to update an existing customer
-     Route::put('/customers/update/{id}', [CustomerController::class, 'update'])->name('customers.update');
+    Route::put('/customers/update/{id}', [CustomerController::class, 'update'])->name('customers.update');
 
 
     //Projects Controller will be Here
@@ -216,6 +217,7 @@ Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified', 'hasComp
     //Repayment Form
     // routes/web.php
     Route::post('/projects/repayment', [ProjectRepaymentController::class, 'store'])->name('projects.repayment.store');
+
 
     //Project Division
     // Project Division Routes
@@ -228,11 +230,15 @@ Route::group(['prefix' => 'agent', 'middleware' => ['auth', 'verified', 'hasComp
     Route::put('/project/division/{id}/update', [ProjectDivisionController::class, 'update'])->name('project.division.update');
 
 
-// Delete Project Division
-   Route::delete('/project/division/{id}/destroy', [ProjectDivisionController::class, 'destroy'])->name('project.division.destroy');
-  //Project manage  Unity
+    // Delete Project Division
+    Route::delete('/project/division/{id}/destroy', [ProjectDivisionController::class, 'destroy'])->name('project.division.destroy');
+    //Project manage  Unity
     Route::resource('project/units', UnitController::class);
-  
+    //Customer payment 
+    Route::get('/project/{project}/division/{division}/payment', [CustomerPaymentController::class, 'create'])->name('project.division.payment.create');
+
+    // Route to handle the submission of the Uza form (create payment)
+    Route::post('/project/{project}/division/{division}/payment', [CustomerPaymentController::class, 'store'])->name('project.division.payment.store');
 
     //store multiple Images
     Route::post('/update/properties', 'App\Http\Controllers\Agent\PropertyController@update');
